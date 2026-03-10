@@ -420,7 +420,7 @@ async function doSearch() {
   resultDiv.innerHTML = `<div class="result-card"><div class="loading"><div class="dots"><span></span><span></span><span></span></div>Finn skýringu á „${query}"…</div></div>`;
   window.scrollTo({top: resultDiv.offsetTop - 70, behavior:"smooth"});
   try {
-    const res = await fetch("https://api.anthropic.com/v1/messages", {
+    const res = await fetch("/api/explain", {
       method:"POST", headers:{"Content-Type":"application/json"},
       body: JSON.stringify({
         model:"claude-sonnet-4-20250514", max_tokens:1000,
