@@ -403,7 +403,120 @@ glossary.forEach(item => {
   grid.appendChild(c);
 });
 
-// ── AI SEARCH ────────────────────────────────────────────────────
+// ── HUGTÖK GAGNASAFN ─────────────────────────────────────────────
+// Bættu við nýjum hugtökum hér! Fylgdu sama sniðmáti.
+const hugtokData = [
+  {
+    term: "Verðbólga",
+    category: "grunnur",
+    explanation: "Verðbólga er þegar verðlag á vörum og þjónustu hækkar með tímanum, þannig að sama upphæð kaupir minna en áður. Á Íslandi mælum við verðbólgu með verðlagsindex Hagstofunnar.",
+    example: "Ef verðbólga er 5% og þú átt 100.000 kr í sparnaði, þá þarf 105.000 kr eftir eitt ár til að kaupa sama magn af vörum.",
+    keyNumber: "5.1%",
+    keyNumberLabel: "Verðbólga á Íslandi (2024)",
+    tip: "Ef vextir á sparireikningi eru lægri en verðbólga, ertu að tapa í raun peninga."
+  },
+  {
+    term: "Vextir",
+    category: "grunnur",
+    explanation: "Vextir eru verð þess að lána eða fá lánað peninga. Þegar þú tekur lán borgðar þú vexti til bankans. Þegar þú sparar, greiðir bankinn þér vexti.",
+    example: "Ef þú tekur 1.000.000 kr bílalán með 8% vöxtum, borgar þú um 80.000 kr í vexti á fyrsta árinu.",
+    keyNumber: "9.0%",
+    keyNumberLabel: "Stýrivextir Seðlabanka Íslands",
+    tip: "Alltaf borga skuldir með hæstu vöxtum fyrst — það sparar þér mest."
+  },
+  {
+    term: "Hlutabréf",
+    category: "hlutabref",
+    explanation: "Hlutabréf eru eignarhlutir í fyrirtæki. Þegar þú kaupir hlutabréf í fyrirtæki, ert þú að kaupa þér eignarhlut — litla eign í því fyrirtæki og rétt á hluta af hagnaðinum.",
+    example: "Ef Marel er skráð á hlutabréfamarkað og þú kaupir 100 hluti, ert þú eigandi að litlum hluta af Marel og þér gengur vel þegar þeim gengur vel.",
+    keyNumber: "7-10%",
+    keyNumberLabel: "Meðalávöxtun hlutabréfa á ári (söguleg)",
+    tip: "Dreifðu fjárfestingum á marga hlutabréfasjóði í stað þess að setja allt í eitt fyrirtæki."
+  },
+  {
+    term: "Skuldabréf",
+    category: "grunnur",
+    explanation: "Skuldabréf er lán sem þú gefur fyrirtæki eða ríki. Þeir lofa að greiða þér föstu vexti reglulega og skila höfuðstólnum á gjalddaga.",
+    example: "Ríkissjóður Íslands gefur út skuldabréf til að fjármagna sig. Þú kaupir 500.000 kr skuldabréf og færð 4% vexti á ári í 5 ár.",
+    keyNumber: "7.2%",
+    keyNumberLabel: "Vextir á 10 ára ríkisbréfum",
+    tip: "Skuldabréf eru almennt öruggari en hlutabréf en gefa lægri ávöxtun til lengri tíma."
+  },
+  {
+    term: "ETF",
+    category: "hlutabref",
+    explanation: "ETF (Exchange Traded Fund) er fjárfestingarsjóður sem er skráður á hlutabréfamarkað. Hann inniheldur mörg hlutabréf í einu, þannig að þú dreifir áhættu með einni fjárfestingu.",
+    example: "S&P 500 ETF fylgir 500 stærstu fyrirtækjum í Bandaríkjunum. Með því að kaupa eitt ETF ert þú í raun að fjárfesta í öllum 500 fyrirtækjunum.",
+    keyNumber: "0.03-0.5%",
+    keyNumberLabel: "Þóknun ETF á ári (mjög lág)",
+    tip: "ETF með lágar þóknanir (index funds) slá oft dýrari sjóði til langs tíma."
+  },
+  {
+    term: "P/E hlutfall",
+    category: "hlutabref",
+    explanation: "P/E hlutfall (Price-to-Earnings) sýnir hversu dýrt hlutabréf er miðað við hagnað fyrirtækisins. Það er reiknað með því að deila hlutabréfaverði með hagnaði á hlut.",
+    example: "Ef hlutabréf kostar 1.000 kr og hagnaður á hlut er 50 kr, er P/E hlutfallið 20. Það þýðir að þú greiðir 20x árshagnað.",
+    keyNumber: "15-25",
+    keyNumberLabel: "Meðal P/E á S&P 500 sögulega",
+    tip: "Lágt P/E getur þýtt að hlutabréfið sé ódýrt — en gæti líka þýtt að eitthvað sé að."
+  },
+  {
+    term: "Lífeyrissjóður",
+    category: "lifeyrir",
+    explanation: "Lífeyrissjóður er skyldusparnaður á Íslandi sem tryggir þér tekjur þegar þú hættir að vinna. Bæði þú og vinnuveitandi þinn leggja reglulega í sjóðinn.",
+    example: "Af hverri 100.000 kr launum fara 4% frá þér (4.000 kr) og 11.5% frá vinnuveitanda (11.500 kr) í lífeyrissjóð — samtals 15.500 kr á mánuði.",
+    keyNumber: "15.5%",
+    keyNumberLabel: "Lágmarksiðgjald af launum",
+    tip: "Þú getur bætt við séreignarsparnaði upp að 4% extra og fær skattafslátt af því."
+  },
+  {
+    term: "Vaxtaþekja",
+    category: "grunnur",
+    explanation: "Vaxtaþekja (Interest Coverage Ratio) mælir hvort fyrirtæki geti borgað vexti sína af rekstrartekjum. Það er mikilvægt mat á fjárhagslegu heilbrigði fyrirtækis.",
+    example: "Ef fyrirtæki hefur 10 millj. kr í rekstrarhagnað og 2 millj. kr í vaxtagjöld, er vaxtaþekjan 5x — þ.e. tekjurnar eru fimmfalt hærri en vaxtagjöldin.",
+    keyNumber: "2x",
+    keyNumberLabel: "Lágmark — undir þessu er áhætta",
+    tip: "Vaxtaþekja undir 1.5x þýðir að fyrirtækið á í erfiðleikum með að greiða skuldir."
+  },
+  {
+    term: "Arðsemi",
+    category: "grunnur",
+    explanation: "Arðsemi (Return on Investment / ROI) mælir hversu mikið þú færð til baka miðað við það sem þú fjárfestar. Það er grundvallarmælikvarði í fjármálum.",
+    example: "Ef þú kaupir hlutabréf fyrir 100.000 kr og selur þau fyrir 120.000 kr eftir eitt ár, er arðsemin þín 20%.",
+    keyNumber: "10%",
+    keyNumberLabel: "Langtíma arðsemi hlutabréfamarkaðar",
+    tip: "Mundu alltaf að taka tillit til verðbólgu þegar þú reiknar raunverulega arðsemi."
+  },
+  {
+    term: "Afleiður",
+    category: "afl",
+    explanation: "Afleiður (Derivatives) eru fjármálasamningar þar sem verðið er byggt á einhverju öðru — t.d. hlutabréfi, gjaldmiðli eða hrávöru. Þær eru oft notaðar til að verjast áhættu.",
+    example: "Íslenskt útflutningsfyrirtæki sem fær greiddar dollara getur keypt gjaldmiðlaafleiður til að verja sig gegn því að dollarinn veikist.",
+    keyNumber: "Há áhætta",
+    keyNumberLabel: "Afleiður eru flóknar og geta tapað miklu",
+    tip: "Byrjaðir fjárfestar ættu að forðast afleiður — þær eru flóknar og mjög áhættusamar."
+  },
+  {
+    term: "Sjóðstreymi",
+    category: "grunnur",
+    explanation: "Sjóðstreymi (Cash Flow) er munurinn á peningum sem koma inn og fara út úr fyrirtæki. Jákvætt sjóðstreymi þýðir að fyrirtækið hefur fleiri peninga en það eyðir.",
+    example: "Ef verslun fær 2 millj. kr í sölu en greiðir 1.5 millj. kr í leiga, laun og vörur, er sjóðstreymið 500.000 kr — jákvætt og heilbrigt.",
+    keyNumber: "Jákvætt",
+    keyNumberLabel: "Heilbrigt fyrirtæki hefur jákvætt sjóðstreymi",
+    tip: "Fyrirtæki getur sýnt hagnað á blaði en samt farið gjaldþrota ef sjóðstreymið er neikvætt."
+  },
+  {
+    term: "Stýrivextir",
+    category: "grunnur",
+    explanation: "Stýrivextir eru vextir sem Seðlabanki Íslands setur og hafa áhrif á alla vexti í landinu. Þegar verðbólga er há, hækkar seðlabankinn vexti til að kæla hagkerfið.",
+    example: "Þegar Seðlabankinn hækkaði stýrivexti í 9% árið 2023, hækkuðu vextir á öllum lánum — bæði íbúðalánum og bíllánum.",
+    keyNumber: "9.0%",
+    keyNumberLabel: "Stýrivextir á Íslandi (2024)",
+    tip: "Hærri stýrivextir = dýrari lán en betri sparivextir. Lægri stýrivextir = ódýrari lán."
+  },
+];
+
+// ── LEIT ─────────────────────────────────────────────────────────
 document.getElementById("searchInput").addEventListener("keydown", e => { if(e.key==="Enter") doSearch(); });
 
 function quickSearch(term) {
@@ -412,51 +525,43 @@ function quickSearch(term) {
   doSearch();
 }
 
-async function doSearch() {
-  const query = document.getElementById("searchInput").value.trim();
+function doSearch() {
+  const query = document.getElementById("searchInput").value.trim().toLowerCase();
   if (!query) return;
   const resultDiv = document.getElementById("result");
   resultDiv.style.display = "block";
-  resultDiv.innerHTML = `<div class="result-card"><div class="loading"><div class="dots"><span></span><span></span><span></span></div>Finn skýringu á „${query}"…</div></div>`;
   window.scrollTo({top: resultDiv.offsetTop - 70, behavior:"smooth"});
-  try {
-    const res = await fetch("/api/explain", {
-      method:"POST", headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({
-        model:"claude-sonnet-4-20250514", max_tokens:1000,
-        messages:[{role:"user",content:`Þú ert íslenskur fjármálasérfræðingur sem útskýrir fjármálahugtök einfalda og skemmtilega hátt fyrir ungt fólk á Íslandi (18-25 ára).
 
-Útskýrðu: "${query}"
+  const match = hugtokData.find(h => h.term.toLowerCase() === query)
+    || hugtokData.find(h => h.term.toLowerCase().includes(query))
+    || hugtokData.find(h => h.explanation.toLowerCase().includes(query));
 
-Svaraðu EINGÖNGU í þessu JSON sniði:
-{"term":"hugtakið","category":"grunnur eða hlutabref eða lifeyrir eða afl","explanation":"2-3 setningar á einfaldri íslensku","example":"íslenskt dæmi 1-2 setningar","keyNumber":"áhugaverð tala t.d. 9.0%","keyNumberLabel":"hvað talan þýðir","tip":"ein gagnleg ráðlegging"}`}]
-      })
-    });
-    const data = await res.json();
-    const info = JSON.parse(data.content[0].text.replace(/```json|```/g,"").trim());
-    const cc = catClass[info.category] || "cat-grunnur";
-    const cl = {grunnur:"Grunnur",hlutabref:"Hlutabréf",lifeyrir:"Lífeyrir",afl:"Afleiður"}[info.category]||info.category;
-    resultDiv.innerHTML = `<div class="result-card">
-      <div class="result-header">
-        <div class="result-term">${info.term}</div>
-        <span class="result-cat ${cc}">${cl}</span>
-      </div>
-      <div class="result-body">
-        <p class="result-explain">${info.explanation}</p>
-        <div class="result-box"><h4>🇮🇸 Íslenskt dæmi</h4><p>${info.example}</p></div>
-        <div class="result-box" style="text-align:center">
-          <h4>Tala til að þekkja</h4>
-          <span class="big-num">${info.keyNumber}</span>
-          <p>${info.keyNumberLabel}</p>
-        </div>
-        <div class="result-box" style="grid-column:1/-1;background:#fffdf5;border-color:#e8d99a">
-          <h4>💡 Gott að vita</h4><p>${info.tip}</p>
-        </div>
-      </div>
-    </div>`;
-  } catch(e) {
-    resultDiv.innerHTML = `<div class="result-card"><div class="loading" style="color:var(--red)">Eitthvað fór úrskeiðis — reyndu aftur 🤷</div></div>`;
+  if (!match) {
+    resultDiv.innerHTML = `<div class="result-card"><div class="loading" style="color:var(--red)">Hugtakið „${query}" fannst ekki — reyndu annað 🔍</div></div>`;
+    return;
   }
+
+  const cc = catClass[match.category] || "cat-grunnur";
+  const cl = {grunnur:"Grunnur",hlutabref:"Hlutabréf",lifeyrir:"Lífeyrir",afl:"Afleiður"}[match.category] || match.category;
+
+  resultDiv.innerHTML = `<div class="result-card">
+    <div class="result-header">
+      <div class="result-term">${match.term}</div>
+      <span class="result-cat ${cc}">${cl}</span>
+    </div>
+    <div class="result-body">
+      <p class="result-explain">${match.explanation}</p>
+      <div class="result-box"><h4>🇮🇸 Íslenskt dæmi</h4><p>${match.example}</p></div>
+      <div class="result-box" style="text-align:center">
+        <h4>Tala til að þekkja</h4>
+        <span class="big-num">${match.keyNumber}</span>
+        <p>${match.keyNumberLabel}</p>
+      </div>
+      <div class="result-box" style="grid-column:1/-1;background:#fffdf5;border-color:#e8d99a">
+        <h4>💡 Gott að vita</h4><p>${match.tip}</p>
+      </div>
+    </div>
+  </div>`;
 }
 
 // ── DICTIONARY ───────────────────────────────────────────────────
