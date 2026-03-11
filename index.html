@@ -212,6 +212,38 @@
     nav { padding:0 1rem; }
     .tabs .tab-btn { padding:0.4rem 0.7rem; font-size:0.75rem; }
   }
+
+  /* ── SAGA ── */
+  .saga-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:1rem; }
+  .saga-card { background:white; border:1.5px solid #e5e0d6; border-radius:5px; padding:1.4rem 1.5rem; position:relative; overflow:hidden; transition:all 0.15s; }
+  .saga-card:hover { border-color:var(--gold); box-shadow:0 4px 14px rgba(0,0,0,0.06); transform:translateY(-2px); }
+  .saga-card::before { content:""; position:absolute; top:0; left:0; right:0; height:3px; background:var(--gold); }
+  .saga-year { font-family:var(--serif); font-size:2rem; font-weight:700; color:var(--gold); line-height:1; margin-bottom:0.4rem; }
+  .saga-title { font-family:var(--serif); font-size:1.05rem; font-weight:700; margin-bottom:0.6rem; }
+  .saga-text { font-size:0.85rem; font-weight:300; line-height:1.7; color:#555; }
+
+  /* ── QUIZ ── */
+  .quiz-wrap { max-width:680px; margin:0 auto; padding:0 2rem 3rem; }
+  .quiz-score-bar { display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; font-size:0.82rem; font-weight:500; color:#888; }
+  .quiz-card { background:white; border:1.5px solid #e0dbd0; border-radius:6px; overflow:hidden; }
+  .quiz-question { font-family:var(--serif); font-size:1.3rem; font-weight:700; padding:1.8rem 1.8rem 1.2rem; line-height:1.4; letter-spacing:-0.01em; }
+  .quiz-options { padding:0 1.2rem 1.2rem; display:flex; flex-direction:column; gap:0.5rem; }
+  .quiz-option { padding:0.85rem 1.1rem; background:var(--paper); border:1.5px solid #ddd; border-radius:4px; cursor:pointer; font-family:var(--sans); font-size:0.9rem; font-weight:400; text-align:left; transition:all 0.15s; }
+  .quiz-option:hover:not(:disabled) { border-color:var(--gold); background:rgba(200,146,42,0.05); }
+  .quiz-option.correct { border-color:var(--teal); background:var(--teal-light); color:var(--teal); font-weight:500; }
+  .quiz-option.wrong { border-color:var(--red); background:var(--red-light); color:var(--red); }
+  .quiz-option:disabled { cursor:default; }
+  .quiz-feedback { padding:0 1.8rem 1.4rem; font-size:0.85rem; font-weight:300; line-height:1.65; color:#555; min-height:2rem; }
+  .quiz-next-btn { margin:0 1.2rem 1.2rem; padding:0.75rem 1.4rem; background:var(--gold); color:white; border:none; border-radius:4px; cursor:pointer; font-family:var(--sans); font-size:0.9rem; font-weight:500; width:calc(100% - 2.4rem); transition:background 0.2s; }
+  .quiz-next-btn:hover { background:#b07d22; }
+  .quiz-final-card { background:white; border:1.5px solid #e0dbd0; border-radius:6px; padding:3rem 2rem; text-align:center; }
+  .quiz-final-emoji { font-size:3.5rem; margin-bottom:1rem; }
+  .quiz-final-title { font-family:var(--serif); font-size:1.8rem; font-weight:700; margin-bottom:0.5rem; }
+  .quiz-final-score { font-family:var(--serif); font-size:3.5rem; font-weight:700; color:var(--gold); margin:0.5rem 0; }
+  .quiz-final-msg { font-size:0.95rem; font-weight:300; color:#666; margin-bottom:1.5rem; }
+  .quiz-restart-btn { padding:0.85rem 2rem; background:var(--gold); color:white; border:none; border-radius:4px; cursor:pointer; font-family:var(--sans); font-size:0.95rem; font-weight:500; transition:background 0.2s; }
+  .quiz-restart-btn:hover { background:#b07d22; }
+
 </style>
 </head>
 <body>
@@ -225,6 +257,8 @@
     <button class="tab-btn active" onclick="switchTab('hugtok')" id="tab-hugtok">🔍 Hugtök</button>
     <button class="tab-btn" onclick="switchTab('ordabok')" id="tab-ordabok">📖 Orðabók</button>
     <button class="tab-btn" onclick="switchTab('reiknivel')" id="tab-reiknivel">📈 Reiknivél</button>
+    <button class="tab-btn" onclick="switchTab('saga')" id="tab-saga">📜 Saga</button>
+    <button class="tab-btn" onclick="switchTab('leikur')" id="tab-leikur">🎮 Leikur</button>
   </div>
 </nav>
 
@@ -360,6 +394,59 @@
   </div>
 </div>
 
+<!-- ══ VIEW 4: SAGA ══ -->
+<div class="view" id="view-saga">
+  <div class="page-hero">
+    <h1>Fjármálasaga<br><em>í stuttu máli</em></h1>
+    <p>Stóru augnablikin sem mótuðu fjármálaheim nútímans.</p>
+  </div>
+  <div class="section-wrap">
+    <div class="section-label">Viskumolar úr sögunni</div>
+    <div class="saga-grid">
+      <div class="saga-card"><div class="saga-year">1602</div><div class="saga-title">Fyrsta hlutafélagið</div><div class="saga-text">Hollenski Austur-Indíafélagið (VOC) varð fyrsta opinberlega skráða hlutafélagið í heimsbyggðinni. Það gaf út hlutabréf sem almenningur gat keypt — upphaf hlutabréfamarkaðar eins og við þekkjum hann.</div></div>
+      <div class="saga-card"><div class="saga-year">1907</div><div class="saga-title">Bankakreppan í Bandaríkjunum</div><div class="saga-text">Bankaáhlaup og fjármálaóstæða á Bandaríkjamarkað varð til þess að J.P. Morgan — einkamaður — bjargaði bankakerfi Bandaríkjanna. Þetta leiddi til stofnunar Seðlabanka Bandaríkjanna (Federal Reserve) árið 1913.</div></div>
+      <div class="saga-card"><div class="saga-year">1929</div><div class="saga-title">Hrunið mikla</div><div class="saga-text">Wall Street Crash leiddi til Miklu lægðarinnar. Hlutabréfaverð féll um 89% á þremur árum. Milljónar misstu atvinnu. Þetta breytti hugsuninni um hlutverk ríkisins í hagkerfinu að eilífu.</div></div>
+      <div class="saga-card"><div class="saga-year">1944</div><div class="saga-title">Bretton Woods</div><div class="saga-text">44 þjóðir hittust í New Hampshire og sköpuðu nýtt alþjóðlegt fjármálakerfi. Dollar varð heimsgjaldmiðill bundinn við gull. IMF og Heimsbankinn voru stofnaðir. Þetta kerfi stóð þar til Nixon hætti við gulltengilinn 1971.</div></div>
+      <div class="saga-card"><div class="saga-year">1971</div><div class="saga-title">Nixon hætti við gullið</div><div class="saga-text">Bandaríkjaforsetinn Richard Nixon tilkynnti að dollar yrði ekki lengur innleysanlegur í gull. Þetta endaði Bretton Woods kerfið og skapaði fljótandi gjaldmiðla þar sem gengi ræðst af framboði og eftirspurn.</div></div>
+      <div class="saga-card"><div class="saga-year">1987</div><div class="saga-title">Svarta mánudagurinn</div><div class="saga-text">Þann 19. október 1987 féll Dow Jones hlutabréfavísitalan um 22,6% á einum degi — stærsta dagleg lækkun í sögunni. Tölvur og sjálfvirk viðskiptakerfi gerðu hrunið hlutfallslega verra.</div></div>
+      <div class="saga-card"><div class="saga-year">2000</div><div class="saga-title">Dot-com bólan</div><div class="saga-text">Internetfyrirtæki með engar tekjur voru metin á milljarða dala. Þegar bólan sprakk 2000-2002 töpuðust 5 trilljónar dala. Amazon lækkaði um 90% — en lifði af og varð eitt mest virta fyrirtæki í heiminum.</div></div>
+      <div class="saga-card"><div class="saga-year">2008</div><div class="saga-title">Íslandshrunið</div><div class="saga-text">Þrír stærstu bankar Íslands — Kaupþing, Landsbanki og Glitnir — féllu á þremur dögum í október 2008. Bankarnir höfðu stækkað í yfir 10 sinnum landsframleiðslu. Íslendingar náðu sér á strik hraðar en flestir spáðu.</div></div>
+      <div class="saga-card"><div class="saga-year">2009</div><div class="saga-title">Bitcoin fæðist</div><div class="saga-text">Einstaklingur eða hópur undir dulnefninu Satoshi Nakamoto sendi fyrstu Bitcoin-viðskiptin. Hugmyndin: rafmynt án banka eða ríkis. Fyrstu 10.000 Bitcoin voru greiddar fyrir pizzu árið 2010.</div></div>
+      <div class="saga-card"><div class="saga-year">2020</div><div class="saga-title">COVID-hrunið og bati</div><div class="saga-text">Hlutabréfamarkaðir hrundu um 34% á 33 dögum í mars 2020 — hraðasta hrun í sögunni. En seðlabankar dældu peningum inn og markaðir höfðu náð sér að fullu eftir aðeins 5 mánuði.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ VIEW 5: LEIKUR ══ -->
+<div class="view" id="view-leikur">
+  <div class="page-hero">
+    <h1>Fjármála<br><em>spurningakeppni</em></h1>
+    <p>Prófaðu þekkingu þína á fjármálahugtökum!</p>
+  </div>
+  <div class="quiz-wrap">
+    <div id="quiz-container">
+      <div class="quiz-score-bar">
+        <span id="quiz-score-text">Stig: 0</span>
+        <span id="quiz-q-num">Spurning 1 af 10</span>
+      </div>
+      <div class="quiz-card" id="quiz-card">
+        <div class="quiz-question" id="quiz-question">Smelltu á flipann til að byrja!</div>
+        <div class="quiz-options" id="quiz-options"></div>
+        <div class="quiz-feedback" id="quiz-feedback"></div>
+      </div>
+    </div>
+    <div id="quiz-result" style="display:none">
+      <div class="quiz-final-card">
+        <div class="quiz-final-emoji" id="quiz-final-emoji">🎉</div>
+        <div class="quiz-final-title" id="quiz-final-title">Þetta gekk vel!</div>
+        <div class="quiz-final-score" id="quiz-final-score">8/10</div>
+        <div class="quiz-final-msg" id="quiz-final-msg">Frábær þekking!</div>
+        <button class="quiz-restart-btn" onclick="startQuiz()">Spila aftur 🔄</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <footer>
   Gerður af nemanda í fjármálaverkfræði — <strong>ekki fjárfestingarráðgjöf</strong>
 </footer>
@@ -375,6 +462,7 @@ function switchTab(name) {
   document.getElementById("view-" + name).classList.add("active");
   document.getElementById("tab-" + name).classList.add("active");
   if (name === "ordabok" && !dictLoaded) initDict();
+  if (name === "leikur") startQuiz();
 }
 
 // ── GLOSSARY CARDS ───────────────────────────────────────────────
@@ -411,8 +499,8 @@ const hugtokData = [
     category: "grunnur",
     explanation: "Verðbólga er þegar verðlag á vörum og þjónustu hækkar með tímanum, þannig að sama upphæð kaupir minna en áður. Á Íslandi mælum við verðbólgu með verðlagsindex Hagstofunnar.",
     example: "Ef verðbólga er 5% og þú átt 100.000 kr í sparnaði, þá þarf 105.000 kr eftir eitt ár til að kaupa sama magn af vörum.",
-    keyNumber: "5.1%",
-    keyNumberLabel: "Verðbólga á Íslandi (2024)",
+    keyNumber: "5.2%",
+    keyNumberLabel: "Verðbólga á Íslandi (febrúar 2026)",
     tip: "Ef vextir á sparireikningi eru lægri en verðbólga, ertu að tapa í raun peninga."
   },
   {
@@ -420,8 +508,8 @@ const hugtokData = [
     category: "grunnur",
     explanation: "Vextir eru verð þess að lána eða fá lánað peninga. Þegar þú tekur lán borgðar þú vexti til bankans. Þegar þú sparar, greiðir bankinn þér vexti.",
     example: "Ef þú tekur 1.000.000 kr bílalán með 8% vöxtum, borgar þú um 80.000 kr í vexti á fyrsta árinu.",
-    keyNumber: "9.0%",
-    keyNumberLabel: "Stýrivextir Seðlabanka Íslands",
+    keyNumber: "7.25%",
+    keyNumberLabel: "Stýrivextir Seðlabanka Íslands (2026)",
     tip: "Alltaf borga skuldir með hæstu vöxtum fyrst — það sparar þér mest."
   },
   {
@@ -506,12 +594,75 @@ const hugtokData = [
     tip: "Fyrirtæki getur sýnt hagnað á blaði en samt farið gjaldþrota ef sjóðstreymið er neikvætt."
   },
   {
+    term: "Rafmynt",
+    category: "hlutabref",
+    explanation: "Rafmynt (cryptocurrency) er stafræn gjaldmiðill sem notar dulritun (cryptography) til að tryggja viðskipti og stjórna framleiðslu á nýjum einingum. Hún er ekki gefin út af neinum banka eða ríki.",
+    example: "Bitcoin er mest þekkt rafmyntin. Ef þú hefðir keypt Bitcoin fyrir 10.000 kr árið 2015, hefðu þær verið orðnar að milljónum króna á hápunkti 2021.",
+    keyNumber: "21 milljón",
+    keyNumberLabel: "Hámarksfjöldi Bitcoin sem verður til",
+    tip: "Rafmyntir eru mjög sveiflukennar — fjárfestu aldrei meira en þú ræður við að tapa."
+  },
+  {
+    term: "Hlutafélag (hf.)",
+    category: "hlutabref",
+    explanation: "Hlutafélag er fyrirtækjaform þar sem eignin er skipt í hluti (hlutabréf) sem hægt er að selja og kaupa. Hluthafar bera takmarkaða ábyrgð — þeir geta aðeins tapað því sem þeir fjárfestu.",
+    example: "Kaupþing hf., Marel hf. og Icelandair Group hf. eru dæmi um hlutafélög á Íslandi. Þú getur keypt hluti í þeim á hlutabréfamarkaðnum.",
+    keyNumber: "500.000 kr",
+    keyNumberLabel: "Lágmarks hlutafé við stofnun hf.",
+    tip: "hf. á Íslandi þarf að skila ársreikningi og gera hann opinberan — gott fyrir gegnsæi."
+  },
+  {
+    term: "Einkahlutafélag (ehf.)",
+    category: "hlutabref",
+    explanation: "Einkahlutafélag er algengasta fyrirtækjaformið á Íslandi. Líkt og hf. bera eigendur takmarkaða ábyrgð, en ehf. þarf minna hlutafé og er einfaldara í rekstri.",
+    example: "Flest lítil og meðalstór fyrirtæki á Íslandi eru ehf. — t.d. kaffihúsið á götunni eða tæknifyrirtæki með 5 starfsmenn.",
+    keyNumber: "500.000 kr",
+    keyNumberLabel: "Lágmarks hlutafé við stofnun ehf.",
+    tip: "Munurinn á hf. og ehf. er mest sá að hf. getur skráð sig á hlutabréfamarkað en ehf. ekki."
+  },
+  {
+    term: "Verðtrygging",
+    category: "grunnur",
+    explanation: "Verðtrygging þýðir að lán eða sparnaður er bundinn við verðlag. Ef verðbólga hækkar, hækkar höfuðstóll lánsins líka. Þetta er séríslenst fyrirbæri sem er mjög sjaldgæft erlendis.",
+    example: "Ef þú tekur 30 millj. kr verðtryggt íbúðalán og verðlag hækkar um 5%, verður eftirstöðvar lánsins 31,5 millj. kr — jafnvel þótt þú hafir verið að borga.",
+    keyNumber: "~70%",
+    keyNumberLabel: "Hlutfall verðtryggðra íbúðalána á Íslandi",
+    tip: "Verðtryggð lán eru vandræðaleg þegar verðbólga er há — íhugaðu óverðtryggð lán ef mögulegt."
+  },
+  {
+    term: "Gengi",
+    category: "grunnur",
+    explanation: "Gengi gjaldmiðils er verð hans miðað við annan gjaldmiðil. Þegar krónan veikist þarf fleiri krónur til að kaupa dollara eða evrur, sem gerir innfluttar vörur dýrari.",
+    example: "Ef gengi USD/ISK er 138 þýðir það að 1 Bandaríkjadalur kostar 138 krónur. Ef þú kaupir vöru á Amazon fyrir $100 kostar hún 13.800 kr.",
+    keyNumber: "138",
+    keyNumberLabel: "USD/ISK gengi (2026)",
+    tip: "Ferðalag til útlanda verður dýrara þegar krónan veikist — fylgstu með genginu!"
+  },
+  {
+    term: "Hlutabréfamarkaður",
+    category: "hlutabref",
+    explanation: "Hlutabréfamarkaður er staður þar sem hlutabréf í skráðum fyrirtækjum eru keypt og seld. Á Íslandi er þetta Kauphöll Íslands (Nasdaq Iceland) þar sem m.a. Marel og Icelandair eru skráð.",
+    example: "OMXI10 er vísitala sem fylgir 10 stærstu fyrirtækjum á Kauphöll Íslands. Ef hún hækkar um 1% þýðir það að þessi 10 fyrirtæki eru í heildina að verða 1% dýrari.",
+    keyNumber: "OMXI10",
+    keyNumberLabel: "Helsta hlutabréfavísitala Íslands",
+    tip: "Íslenska hlutabréfamarkaðurinn er lítill — hugsaðu um að dreifa fjárfestingum á erlenda markaði líka."
+  },
+  {
+    term: "Vaxtastig",
+    category: "grunnur",
+    explanation: "Vaxtastig lýsir því hversu háir eða lágir vextir eru almennt í hagkerfinu. Hátt vaxtastig gerir lán dýrari en sparnaður gefur betri ávöxtun.",
+    example: "Þegar Seðlabankinn hækkaði stýrivexti í 9% árið 2023, hækkuðu vextir á nýjum íbúðalánum úr um 5% í yfir 9% á nokkrum mánuðum.",
+    keyNumber: "7.25%",
+    keyNumberLabel: "Núverandi stýrivextir (febrúar 2026)",
+    tip: "Þegar vaxtastig er hátt er oft gott tækifæri til að festa sparnað í bundnum innlánum."
+  },
+  {
     term: "Stýrivextir",
     category: "grunnur",
     explanation: "Stýrivextir eru vextir sem Seðlabanki Íslands setur og hafa áhrif á alla vexti í landinu. Þegar verðbólga er há, hækkar seðlabankinn vexti til að kæla hagkerfið.",
     example: "Þegar Seðlabankinn hækkaði stýrivexti í 9% árið 2023, hækkuðu vextir á öllum lánum — bæði íbúðalánum og bíllánum.",
-    keyNumber: "9.0%",
-    keyNumberLabel: "Stýrivextir á Íslandi (2024)",
+    keyNumber: "7.25%",
+    keyNumberLabel: "Stýrivextir á Íslandi (2026)",
     tip: "Hærri stýrivextir = dýrari lán en betri sparivextir. Lægri stýrivextir = ódýrari lán."
   },
 ];
@@ -667,6 +818,155 @@ function calcPension() {
 }
 
 calcSav(); calcLoan(); calcPension();
+
+// ── QUIZ ─────────────────────────────────────────────────────────
+const quizQuestions = [
+  {
+    q: "Hvað þýðir verðbólga?",
+    opts: ["Hlutabréfaverð hækkar", "Verðlag á vörum og þjónustu hækkar", "Bankavextir hækka", "Krónan styrkist"],
+    correct: 1,
+    explanation: "Verðbólga er þegar verðlag á vörum og þjónustu hækkar með tímanum — sama upphæð kaupir minna."
+  },
+  {
+    q: "Hversu mikið af launum þinna fer í lífeyrissjóð (lágmark)?",
+    opts: ["5%", "10%", "15.5%", "20%"],
+    correct: 2,
+    explanation: "4% frá þér og 11.5% frá vinnuveitanda = 15.5% samtals af hverri launagreiðslu."
+  },
+  {
+    q: "Hvað er ETF?",
+    opts: ["Tegund lífeyrissjóðs", "Sjóður sem inniheldur mörg hlutabréf", "Erlend gjaldmiðilsviðskipti", "Tegund skuldabréfs"],
+    correct: 1,
+    explanation: "ETF (Exchange Traded Fund) er sjóður með mörgum hlutabréfum sem er skráður á hlutabréfamarkað."
+  },
+  {
+    q: "Hvað gerir Seðlabanki Íslands þegar verðbólga er of há?",
+    opts: ["Lækkar stýrivexti", "Hækkar stýrivexti", "Gefur út fleiri seðla", "Kaupir hlutabréf"],
+    correct: 1,
+    explanation: "Seðlabankinn hækkar stýrivexti til að gera lán dýrari og draga úr eftirspurn — sem kælir verðbólguna."
+  },
+  {
+    q: "Hvað þýðir P/E hlutfall 20?",
+    opts: ["Hlutabréfið hefur hækkað um 20%", "Þú greiðir 20 sinnum árshagnað fyrirtækisins", "Fyrirtækið greiðir 20% arð", "Hlutabréfið er 20 ára gamalt"],
+    correct: 1,
+    explanation: "P/E hlutfall sýnir hversu marga árslauna hagnaðar þú ert að greiða fyrir hlutabréfið."
+  },
+  {
+    q: "Hvernig er verðtryggt lán frábrugðið óverðtryggðu láni?",
+    opts: ["Verðtryggt lán hefur alltaf lægri vexti", "Höfuðstóll verðtryggðs láns hækkar með verðlagi", "Verðtryggt lán er alltaf betra", "Engin munur"],
+    correct: 1,
+    explanation: "Á verðtryggðu láni hækkar höfuðstóllinn þegar verðbólga er há — þannig getur þú borið meira en þú tókst lán um."
+  },
+  {
+    q: "Hvaða ár hrundi bankarnir þrír á Íslandi?",
+    opts: ["2000", "2004", "2008", "2012"],
+    correct: 2,
+    explanation: "Kaupþing, Landsbanki og Glitnir féllu í október 2008 í kjölfar alþjóðlegrar fjármálakreppu."
+  },
+  {
+    q: "Hvað er Bitcoin?",
+    opts: ["Stafrænn seðill gefinn út af Seðlabankanum", "Rafmynt án miðstýringar", "Hlutabréfasjóður", "Tegund skuldabréfs"],
+    correct: 1,
+    explanation: "Bitcoin er rafmynt sem byggir á blockchain tækni og er ekki gefin út af neinum banka eða ríki."
+  },
+  {
+    q: "Hvað þýðir jákvætt sjóðstreymi?",
+    opts: ["Fyrirtækið er að hagnast", "Fleiri peningar koma inn en fara út", "Hlutabréfaverð er að hækka", "Vextir eru að lækka"],
+    correct: 1,
+    explanation: "Jákvætt sjóðstreymi þýðir að fyrirtækið fær inn fleiri peninga en það eyðir — það er grundvöllur heilbrigðs reksturs."
+  },
+  {
+    q: "Hvað er munurinn á hf. og ehf.?",
+    opts: ["Engin munur", "hf. getur skráð sig á hlutabréfamarkað en ehf. ekki", "ehf. er alltaf stærra", "hf. þarf minna hlutafé"],
+    correct: 1,
+    explanation: "Stærsti munurinn er að hlutafélag (hf.) getur skráð hlutabréf sín á hlutabréfamarkað en einkahlutafélag (ehf.) getur það ekki."
+  },
+];
+
+let quizState = { current: 0, score: 0, answered: false, questions: [] };
+
+function shuffleArray(arr) {
+  return [...arr].sort(() => Math.random() - 0.5);
+}
+
+function startQuiz() {
+  quizState = { current: 0, score: 0, answered: false, questions: shuffleArray(quizQuestions).slice(0,10) };
+  document.getElementById('quiz-container').style.display = 'block';
+  document.getElementById('quiz-result').style.display = 'none';
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = quizState.questions[quizState.current];
+  const total = quizState.questions.length;
+  document.getElementById('quiz-score-text').textContent = `Stig: ${quizState.score}`;
+  document.getElementById('quiz-q-num').textContent = `Spurning ${quizState.current + 1} af ${total}`;
+  document.getElementById('quiz-question').textContent = q.q;
+  document.getElementById('quiz-feedback').innerHTML = '';
+  const optsDiv = document.getElementById('quiz-options');
+  optsDiv.innerHTML = '';
+  q.opts.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'quiz-option';
+    btn.textContent = opt;
+    btn.onclick = () => answerQuestion(i);
+    optsDiv.appendChild(btn);
+  });
+  // Remove old next btn if present
+  const old = document.getElementById('quiz-next-btn');
+  if (old) old.remove();
+  quizState.answered = false;
+}
+
+function answerQuestion(idx) {
+  if (quizState.answered) return;
+  quizState.answered = true;
+  const q = quizState.questions[quizState.current];
+  const btns = document.querySelectorAll('.quiz-option');
+  btns.forEach(b => b.disabled = true);
+  btns[q.correct].classList.add('correct');
+  if (idx === q.correct) {
+    quizState.score++;
+    document.getElementById('quiz-feedback').innerHTML = `✅ <strong>Rétt!</strong> ${q.explanation}`;
+  } else {
+    btns[idx].classList.add('wrong');
+    document.getElementById('quiz-feedback').innerHTML = `❌ <strong>Rangt.</strong> ${q.explanation}`;
+  }
+  const nextBtn = document.createElement('button');
+  nextBtn.id = 'quiz-next-btn';
+  nextBtn.className = 'quiz-next-btn';
+  nextBtn.textContent = quizState.current + 1 < quizState.questions.length ? 'Næsta spurning →' : 'Sjá niðurstöður 🏆';
+  nextBtn.onclick = () => {
+    quizState.current++;
+    if (quizState.current < quizState.questions.length) {
+      renderQuestion();
+    } else {
+      showResult();
+    }
+  };
+  document.getElementById('quiz-card').appendChild(nextBtn);
+}
+
+function showResult() {
+  document.getElementById('quiz-container').style.display = 'none';
+  document.getElementById('quiz-result').style.display = 'block';
+  const score = quizState.score;
+  const total = quizState.questions.length;
+  document.getElementById('quiz-final-score').textContent = `${score}/${total}`;
+  let emoji, title, msg;
+  if (score === total) { emoji = '🏆'; title = 'Fullkomið!'; msg = 'Þú veist allt um fjármál!'; }
+  else if (score >= 8) { emoji = '🎉'; title = 'Framúrskarandi!'; msg = 'Mjög góð þekking á fjármálum.'; }
+  else if (score >= 6) { emoji = '👍'; title = 'Vel gert!'; msg = 'Góð grunnþekking — haltu áfram að læra!'; }
+  else if (score >= 4) { emoji = '📚'; title = 'Alls ekki slæmt!'; msg = 'Farðu í gegnum Hugtök flipann og reyndu aftur.'; }
+  else { emoji = '💡'; title = 'Byrjendur fara lengra!'; msg = 'Þú ert rétt að byrja — peningar.is er hér til að hjálpa.'; }
+  document.getElementById('quiz-final-emoji').textContent = emoji;
+  document.getElementById('quiz-final-title').textContent = title;
+  document.getElementById('quiz-final-msg').textContent = msg;
+}
+
+// Start quiz when tab is opened
+const origSwitchTab = switchTab;
+
 </script>
 </body>
 </html>
