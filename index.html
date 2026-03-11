@@ -188,14 +188,16 @@
   .dict-table { width:100%; border-collapse:collapse; }
   .dict-table th {
     font-size:0.7rem; font-weight:500; letter-spacing:0.1em; text-transform:uppercase;
-    color:#aaa; padding:0.5rem 1rem; text-align:left;
+    color:#aaa; padding:0.65rem 1.2rem; text-align:left;
     border-bottom:2px solid #e0dbd0; background:var(--paper);
-    position:sticky; top:56px; z-index:10;
+    position:sticky; top:0; z-index:10;
   }
-  .dict-table td { padding:0.7rem 1rem; border-bottom:1px solid #f0ece4; font-size:0.9rem; font-weight:300; color:#333; vertical-align:top; }
+  .dict-table td { padding:0.85rem 1.2rem; border-bottom:1px solid #f0ece4; font-size:0.88rem; font-weight:300; color:#333; vertical-align:middle; line-height:1.5; }
   .dict-table tr:hover td { background:#fffdf8; }
   .dict-table tr:last-child td { border-bottom:none; }
-  .dict-table td.en-col { font-weight:400; color:var(--ink); }
+  .dict-table td.en-col { font-weight:500; color:var(--ink); }
+  .dict-table tr:nth-child(even) td { background:#faf8f4; }
+  .dict-table tr:hover td { background:rgba(200,146,42,0.06) !important; }
   .dict-table td.is-col { color:#555; }
   .dict-table .en-highlight { background:rgba(200,146,42,0.2); border-radius:2px; padding:0 1px; }
   .dict-no-results { text-align:center; padding:3rem; color:#bbb; font-size:0.9rem; font-weight:300; }
@@ -244,6 +246,33 @@
   .quiz-restart-btn { padding:0.85rem 2rem; background:var(--gold); color:white; border:none; border-radius:4px; cursor:pointer; font-family:var(--sans); font-size:0.95rem; font-weight:500; transition:background 0.2s; }
   .quiz-restart-btn:hover { background:#b07d22; }
 
+
+  /* ── FRÆÐAST ── */
+  .fraedast-wrap { max-width:860px; margin:0 auto; padding:0 2rem 3rem; }
+  .fraedast-section { margin-bottom:2.5rem; }
+  .fraedast-section-title {
+    font-family:var(--serif); font-size:1.3rem; font-weight:700;
+    letter-spacing:-0.02em; margin-bottom:1rem;
+    display:flex; align-items:center; gap:0.5rem;
+  }
+  .fraedast-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:0.8rem; }
+  .fraedast-card {
+    background:white; border:1.5px solid #e5e0d6; border-radius:5px;
+    padding:1.1rem 1.2rem; display:flex; flex-direction:column; gap:0.3rem;
+    transition:all 0.15s; position:relative; overflow:hidden;
+  }
+  .fraedast-card:hover { border-color:var(--gold); box-shadow:0 4px 14px rgba(0,0,0,0.06); transform:translateY(-2px); }
+  .fraedast-card-emoji { font-size:1.6rem; margin-bottom:0.2rem; }
+  .fraedast-card-title { font-family:var(--serif); font-size:1rem; font-weight:700; line-height:1.3; }
+  .fraedast-card-sub { font-size:0.75rem; font-weight:500; color:var(--gold); letter-spacing:0.04em; }
+  .fraedast-card-desc { font-size:0.82rem; font-weight:300; color:#666; line-height:1.6; margin-top:0.2rem; }
+  .fraedast-tag { display:inline-block; font-size:0.68rem; font-weight:500; letter-spacing:0.08em;
+    text-transform:uppercase; padding:0.18rem 0.55rem; border-radius:999px;
+    background:var(--teal-light); color:var(--teal); margin-top:auto; width:fit-content; }
+  .fraedast-tag.tag-adv { background:var(--blue-light); color:var(--blue); }
+  .fraedast-tag.tag-beg { background:#f0fdf4; color:#166534; }
+  .fraedast-tag.tag-all { background:var(--cream); color:#7a5c1a; }
+
 </style>
 </head>
 <body>
@@ -259,6 +288,7 @@
     <button class="tab-btn" onclick="switchTab('reiknivel')" id="tab-reiknivel">📈 Reiknivél</button>
     <button class="tab-btn" onclick="switchTab('saga')" id="tab-saga">📜 Saga</button>
     <button class="tab-btn" onclick="switchTab('leikur')" id="tab-leikur">🎮 Leikur</button>
+    <button class="tab-btn" onclick="switchTab('fraedast')" id="tab-fraedast">📚 Fræðast</button>
   </div>
 </nav>
 
@@ -324,7 +354,7 @@
       <button onclick="setDictFilter('is',this)">Íslenska → Enska</button>
     </div>
     <div class="dict-count" id="dictCount"></div>
-    <div class="dict-table-wrap">
+    <div class="dict-table-wrap" style="border:1.5px solid #e0dbd0; border-radius:6px; overflow:hidden;">
       <table class="dict-table">
         <thead>
           <tr><th style="width:45%">Enska</th><th>Íslenska</th></tr>
@@ -404,15 +434,15 @@
     <div class="section-label">Viskumolar úr sögunni</div>
     <div class="saga-grid">
       <div class="saga-card"><div class="saga-year">1602</div><div class="saga-title">Fyrsta hlutafélagið</div><div class="saga-text">Hollenski Austur-Indíafélagið (VOC) varð fyrsta opinberlega skráða hlutafélagið í heimsbyggðinni. Það gaf út hlutabréf sem almenningur gat keypt — upphaf hlutabréfamarkaðar eins og við þekkjum hann.</div></div>
-      <div class="saga-card"><div class="saga-year">1907</div><div class="saga-title">Bankakreppan í Bandaríkjunum</div><div class="saga-text">Bankaáhlaup og fjármálaóstæða á Bandaríkjamarkað varð til þess að J.P. Morgan — einkamaður — bjargaði bankakerfi Bandaríkjanna. Þetta leiddi til stofnunar Seðlabanka Bandaríkjanna (Federal Reserve) árið 1913.</div></div>
+      <div class="saga-card"><div class="saga-year">1907</div><div class="saga-title">Bankakreppan í Bandaríkjunum</div><div class="saga-text">Bankaáhlaup og fjármálaóstæða á Bandaríkjamarkað varð til þess að J.P. Morgan — einkamaður — bjargaði bankakerfinu Bandaríkjanna. Þetta leiddi til stofnunar Seðlabanka Bandaríkjanna (Federal Reserve) árið 1913.</div></div>
       <div class="saga-card"><div class="saga-year">1929</div><div class="saga-title">Hrunið mikla</div><div class="saga-text">Wall Street Crash leiddi til Miklu lægðarinnar. Hlutabréfaverð féll um 89% á þremur árum. Milljónar misstu atvinnu. Þetta breytti hugsuninni um hlutverk ríkisins í hagkerfinu að eilífu.</div></div>
-      <div class="saga-card"><div class="saga-year">1944</div><div class="saga-title">Bretton Woods</div><div class="saga-text">44 þjóðir hittust í New Hampshire og sköpuðu nýtt alþjóðlegt fjármálakerfi. Dollar varð heimsgjaldmiðill bundinn við gull. IMF og Heimsbankinn voru stofnaðir. Þetta kerfi stóð þar til Nixon hætti við gulltengilinn 1971.</div></div>
+      <div class="saga-card"><div class="saga-year">1944</div><div class="saga-title">Bretton Woods</div><div class="saga-text">44 þjóðir hittust í New Hampshire og sköpuðu nýtt alþjóðlegt gjaldmiðlakerfi. Dollar varð heimsgjaldmiðill bundinn við gull. IMF og Heimsbankinn voru stofnaðir. Þetta kerfi stóð þar til Nixon hætti við gulltengilinn 1971.</div></div>
       <div class="saga-card"><div class="saga-year">1971</div><div class="saga-title">Nixon hætti við gullið</div><div class="saga-text">Bandaríkjaforsetinn Richard Nixon tilkynnti að dollar yrði ekki lengur innleysanlegur í gull. Þetta endaði Bretton Woods kerfið og skapaði fljótandi gjaldmiðla þar sem gengi ræðst af framboði og eftirspurn.</div></div>
       <div class="saga-card"><div class="saga-year">1987</div><div class="saga-title">Svarta mánudagurinn</div><div class="saga-text">Þann 19. október 1987 féll Dow Jones hlutabréfavísitalan um 22,6% á einum degi — stærsta dagleg lækkun í sögunni. Tölvur og sjálfvirk viðskiptakerfi gerðu hrunið hlutfallslega verra.</div></div>
-      <div class="saga-card"><div class="saga-year">2000</div><div class="saga-title">Dot-com bólan</div><div class="saga-text">Internetfyrirtæki með engar tekjur voru metin á milljarða dala. Þegar bólan sprakk 2000-2002 töpuðust 5 trilljónar dala. Amazon lækkaði um 90% — en lifði af og varð eitt mest virta fyrirtæki í heiminum.</div></div>
+      <div class="saga-card"><div class="saga-year">2000</div><div class="saga-title">Dot-com bólan</div><div class="saga-text">Internetfyrirtæki með engar tekjur voru metin á milljarða dala. Þegar bólan sprakk 2000-2002 töpuðust 5 trilljónar dala. Amazon lækkaði um 90% — en lifði af og varð eitt af mest virtu fyrirtækjum heimsins.</div></div>
       <div class="saga-card"><div class="saga-year">2008</div><div class="saga-title">Íslandshrunið</div><div class="saga-text">Þrír stærstu bankar Íslands — Kaupþing, Landsbanki og Glitnir — féllu á þremur dögum í október 2008. Bankarnir höfðu stækkað í yfir 10 sinnum landsframleiðslu. Íslendingar náðu sér á strik hraðar en flestir spáðu.</div></div>
-      <div class="saga-card"><div class="saga-year">2009</div><div class="saga-title">Bitcoin fæðist</div><div class="saga-text">Einstaklingur eða hópur undir dulnefninu Satoshi Nakamoto sendi fyrstu Bitcoin-viðskiptin. Hugmyndin: rafmynt án banka eða ríkis. Fyrstu 10.000 Bitcoin voru greiddar fyrir pizzu árið 2010.</div></div>
-      <div class="saga-card"><div class="saga-year">2020</div><div class="saga-title">COVID-hrunið og bati</div><div class="saga-text">Hlutabréfamarkaðir hrundu um 34% á 33 dögum í mars 2020 — hraðasta hrun í sögunni. En seðlabankar dældu peningum inn og markaðir höfðu náð sér að fullu eftir aðeins 5 mánuði.</div></div>
+      <div class="saga-card"><div class="saga-year">2009</div><div class="saga-title">Bitcoin fæðist</div><div class="saga-text">Einstaklingur eða hópur undir dulnefninu Satoshi Nakamoto birti fyrstu Bitcoin-viðskiptin. Hugmyndin: rafmynt án banka eða ríkis. Fyrstu 10.000 Bitcoin voru greiddar fyrir pizzu árið 2010.</div></div>
+      <div class="saga-card"><div class="saga-year">2020</div><div class="saga-title">COVID-hrunið og bati</div><div class="saga-text">Hlutabréfamarkaðir hrundu um 34% á 33 dögum í mars 2020 — hraðasta hrun í sögunni. En seðlabankar dældu peningum inn og markaðir höfðu náð sér að fullu eftir aðeins 5 mánuða.</div></div>
     </div>
   </div>
 </div>
@@ -444,6 +474,161 @@
         <button class="quiz-restart-btn" onclick="startQuiz()">Spila aftur 🔄</button>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- ══ VIEW 6: FRÆÐAST ══ -->
+<div class="view" id="view-fraedast">
+  <div class="page-hero">
+    <h1>Fræðast<br><em>um fjármál</em></h1>
+    <p>Bestu kvikmyndir, þættir, bækur og podcasts til að skilja fjármálaheiminn.</p>
+  </div>
+  <div class="fraedast-wrap">
+
+    <div class="fraedast-section">
+      <div class="section-label">Kvikmyndir &amp; sjónvarpsþættir</div>
+      <div class="fraedast-grid">
+        <div class="fraedast-card">
+          <div class="fraedast-card-emoji">🎬</div>
+          <div class="fraedast-card-title">The Big Short</div>
+          <div class="fraedast-card-sub">2015 · Kvikmynd</div>
+          <div class="fraedast-card-desc">Hvernig nokkrir einstaklingar sáu fjármálakreppuna 2008 koma og hagnuðust á henni. Útskýrir flókin fjármálahugtök á skemmtilegan og aðgengilegan hátt.</div>
+          <span class="fraedast-tag tag-beg">Byrjendur</span>
+        </div>
+        <div class="fraedast-card">
+          <div class="fraedast-card-emoji">🎬</div>
+          <div class="fraedast-card-title">Margin Call</div>
+          <div class="fraedast-card-sub">2011 · Kvikmynd</div>
+          <div class="fraedast-card-desc">Spennumynd sem gerist á einni nóttu þegar fjárfestingarbanki uppgötvar að þeir eru á barmi gjaldþrots. Frábær innsýn í hvernig Wall Street virkar að innan.</div>
+          <span class="fraedast-tag tag-all">Allir</span>
+        </div>
+        <div class="fraedast-card">
+          <div class="fraedast-card-emoji">🎬</div>
+          <div class="fraedast-card-title">Inside Job</div>
+          <div class="fraedast-card-sub">2010 · Heimildarmynd</div>
+          <div class="fraedast-card-desc">Oscar-verðlaunaðar heimildarmynd um orsakir fjármálakreppunnar 2008. Skýrir af hverju bankakerfið fór úr böndunum og hverjir bera ábyrgð.</div>
+          <span class="fraedast-tag tag-beg">Byrjendur</span>
+        </div>
+        <div class="fraedast-card">
+          <div class="fraedast-card-emoji">📺</div>
+          <div class="fraedast-card-title">Succession</div>
+          <div class="fraedast-card-sub">2018–2023 · HBO</div>
+          <div class="fraedast-card-desc">Fjölskylduþátt um hlutabréfarisann Waystar Royco og valdabaráttuna um hverjir taka við. Gefur skemmtilega innsýn í heim fjölþjóðlegra fyrirtækja.</div>
+          <span class="fraedast-tag tag-all">Allir</span>
+        </div>
+        <div class="fraedast-card">
+          <div class="fraedast-card-emoji">📺</div>
+          <div class="fraedast-card-title">WeCrashed</div>
+          <div class="fraedast-card-sub">2022 · Apple TV+</div>
+          <div class="fraedast-card-desc">Saga um uppgang og fall WeWork og Adam Neumann. Sýnir hvernig gríðarlegar fjárfestingar og of hátt mat á fyrirtæki getur farið úrskeiðis.</div>
+          <span class="fraedast-tag tag-beg">Byrjendur</span>
+        </div>
+        <div class="fraedast-card">
+          <div class="fraedast-card-emoji">📺</div>
+          <div class="fraedast-card-title">Bad Vegan</div>
+          <div class="fraedast-card-sub">2022 · Netflix</div>
+          <div class="fraedast-card-desc">Hvernig fjármálasvik eru framin — og hvernig fólk er blekkjandi með sér. Góð minning um að vera alltaf gaumgæfinn þegar einhver loðar of góðum tækifærum.</div>
+          <span class="fraedast-tag tag-all">Allir</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="fraedast-section">
+      <div class="section-label">Bækur</div>
+      <div class="fraedast-grid">
+        <div class="fraedast-card">
+          <div class="fraedast-card-emoji">📖</div>
+          <div class="fraedast-card-title">The Psychology of Money</div>
+          <div class="fraedast-card-sub">Morgan Housel · 2020</div>
+          <div class="fraedast-card-desc">Besta byrjendabókin um fjármál. Útskýrir hvernig við hugsum um peninga — og hvernig við getum hugsað betur. Einföld, skemmtileg og mjög gagnleg.</div>
+          <span class="fraedast-tag tag-beg">Byrjendur</span>
+        </div>
+        <div class="fraedast-card">
+          <div class="fraedast-card-emoji">📖</div>
+          <div class="fraedast-card-title">Rich Dad Poor Dad</div>
+          <div class="fraedast-card-sub">Robert Kiyosaki · 1997</div>
+          <div class="fraedast-card-desc">Klassísk bók um muninn á því að vinna fyrir peninga og að láta peninga vinna fyrir þig. Hvetjandi og auðlesinn, jafnvel þótt sumar hugmyndir séu umdeilda.</div>
+          <span class="fraedast-tag tag-beg">Byrjendur</span>
+        </div>
+        <div class="fraedast-card">
+          <div class="fraedast-card-emoji">📖</div>
+          <div class="fraedast-card-title">A Random Walk Down Wall Street</div>
+          <div class="fraedast-card-sub">Burton Malkiel · 1973</div>
+          <div class="fraedast-card-desc">Klassísk fjárfestingarbók sem heldur því fram að index-sjóðir slái flestar faglegar fjárfestingaráætlanir til langs tíma. Upphafsrit passive investing.</div>
+          <span class="fraedast-tag tag-all">Allir</span>
+        </div>
+        <div class="fraedast-card">
+          <div class="fraedast-card-emoji">📖</div>
+          <div class="fraedast-card-title">The Intelligent Investor</div>
+          <div class="fraedast-card-sub">Benjamin Graham · 1949</div>
+          <div class="fraedast-card-desc">Biblía verðmætafjárfestinga (value investing). Warren Buffett kallar hana bestu fjárfestingarbókina sem skrifuð hefur verið. Krefst þolinmæði en borgar sig.</div>
+          <span class="fraedast-tag tag-adv">Lengra kominn</span>
+        </div>
+        <div class="fraedast-card">
+          <div class="fraedast-card-emoji">📖</div>
+          <div class="fraedast-card-title">Í berhögg við kerfið</div>
+          <div class="fraedast-card-sub">Árni Páll Árnason · 2013</div>
+          <div class="fraedast-card-desc">Íslenska bókin um hrunið 2008 séð frá sjónarhorni stjórnmálamanns. Mikilvæg lessning fyrir alla Íslendinga sem vilja skilja hvað gerðist.</div>
+          <span class="fraedast-tag tag-beg">Byrjendur</span>
+        </div>
+        <div class="fraedast-card">
+          <div class="fraedast-card-emoji">📖</div>
+          <div class="fraedast-card-title">Principles</div>
+          <div class="fraedast-card-sub">Ray Dalio · 2017</div>
+          <div class="fraedast-card-desc">Ray Dalio, stofnandi stærsta vogunarsjóðs í heimi, deilir lífsspeki sinni og fjárfestingaheimspeki. Bæði persónuleg og fagleg bók.</div>
+          <span class="fraedast-tag tag-adv">Lengra kominn</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="fraedast-section">
+      <div class="section-label">Podcasts</div>
+      <div class="fraedast-grid">
+        <div class="fraedast-card">
+          <div class="fraedast-card-emoji">🎙️</div>
+          <div class="fraedast-card-title">Planet Money</div>
+          <div class="fraedast-card-sub">NPR · Enska</div>
+          <div class="fraedast-card-desc">Skemmtilegasti hagfræðipodcastinn í heiminum. Útskýrir flókin efnahagsleg fyrirbæri í stuttum þáttum með persónulegum söguþráðum. Fullkominn til að hlusta í bíl.</div>
+          <span class="fraedast-tag tag-beg">Byrjendur</span>
+        </div>
+        <div class="fraedast-card">
+          <div class="fraedast-card-emoji">🎙️</div>
+          <div class="fraedast-card-title">We Study Billionaires</div>
+          <div class="fraedast-card-sub">The Investors Podcast · Enska</div>
+          <div class="fraedast-card-desc">Greinir fjárfestingaáætlanir og hugsunarhátt ríkustu fjárfesta í heiminum — Warren Buffett, Charlie Munger, Ray Dalio og fleiri.</div>
+          <span class="fraedast-tag tag-all">Allir</span>
+        </div>
+        <div class="fraedast-card">
+          <div class="fraedast-card-emoji">🎙️</div>
+          <div class="fraedast-card-title">Acquired</div>
+          <div class="fraedast-card-sub">Ben Gilbert &amp; David Rosenthal · Enska</div>
+          <div class="fraedast-card-desc">Ítarlegar sögur um stærstu fyrirtæki í heiminum — Apple, Nike, LVMH, Berkshire Hathaway. Langar en mjög vel unnar. Bestar þáttanna eru um NVIDIA og Tesla.</div>
+          <span class="fraedast-tag tag-adv">Lengra kominn</span>
+        </div>
+        <div class="fraedast-card">
+          <div class="fraedast-card-emoji">🎙️</div>
+          <div class="fraedast-card-title">Marketplace</div>
+          <div class="fraedast-card-sub">APM Reports · Enska</div>
+          <div class="fraedast-card-desc">Daglegar 30 mínútna fréttir um efnahagsmál á skiljanlegu máli. Frábær leið til að fylgjast með heimsmarkaðnum á meðan þú ert í skóla eða á líkamsæfingu.</div>
+          <span class="fraedast-tag tag-beg">Byrjendur</span>
+        </div>
+        <div class="fraedast-card">
+          <div class="fraedast-card-emoji">🎙️</div>
+          <div class="fraedast-card-title">Peningaþættirnir</div>
+          <div class="fraedast-card-sub">Íslenski · Arion banki</div>
+          <div class="fraedast-card-desc">Íslenskur podcast um fjármál og fjárfestingar. Góður til að fá íslenska sjónarmiðið á alþjóðleg fjármálamál og kynna sér íslenska markaðinn betur.</div>
+          <span class="fraedast-tag tag-beg">Byrjendur</span>
+        </div>
+        <div class="fraedast-card">
+          <div class="fraedast-card-emoji">🎙️</div>
+          <div class="fraedast-card-title">How I Built This</div>
+          <div class="fraedast-card-sub">Guy Raz · NPR · Enska</div>
+          <div class="fraedast-card-desc">Frumkvöðlar segja frá því hvernig þeir byggðu upp stærstu fyrirtæki heimsins — Airbnb, Patagonia, Spanx. Hvetjandi og gefur innsýn í fyrirtækjauppbyggingu.</div>
+          <span class="fraedast-tag tag-all">Allir</span>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 
