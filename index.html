@@ -21,6 +21,25 @@
     --blue-light: #eef2f9;
     --serif: "Fraunces", Georgia, serif;
     --sans: "DM Sans", sans-serif;
+    --border: #e0dbd0;
+    --card-bg: #ffffff;
+    --muted: #666;
+  }
+  [data-theme="dark"] {
+    --ink: #f0ebe0;
+    --paper: #1a1814;
+    --cream: #252018;
+    --gold: #e8ab45;
+    --gold-light: #f0c96a;
+    --teal: #3db896;
+    --teal-light: #0f2e27;
+    --red: #e05a4a;
+    --red-light: #2a1510;
+    --blue: #6b9fd4;
+    --blue-light: #0f1e2e;
+    --border: #333028;
+    --card-bg: #211f1a;
+    --muted: #999;
   }
   * { margin:0; padding:0; box-sizing:border-box; }
   body { background:var(--paper); color:var(--ink); font-family:var(--sans); min-height:100vh; overflow-x:hidden; }
@@ -33,12 +52,24 @@
   nav {
     position:sticky; top:0; z-index:100;
     background:rgba(245,240,232,0.92); backdrop-filter:blur(12px);
-    border-bottom:1px solid #e0dbd0;
+    border-bottom:1px solid var(--border);
     padding:0 2rem;
     display:flex; align-items:center; justify-content:space-between;
     height:56px;
     max-width:100%;
   }
+  [data-theme="dark"] nav { background:rgba(26,24,20,0.95); }
+  .tab-bar {
+    position:sticky; top:56px; z-index:99;
+    background:rgba(245,240,232,0.97); backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--border);
+    padding:0 2rem;
+    display:flex; align-items:center; gap:0.25rem;
+    overflow-x:auto; -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+  }
+  .tab-bar::-webkit-scrollbar { display:none; }
+  [data-theme="dark"] .tab-bar { background:rgba(26,24,20,0.97); }
   .logo { font-family:var(--serif); font-size:1.4rem; font-weight:700; letter-spacing:-0.02em; text-decoration:none; color:var(--ink); }
   .logo span { color:var(--gold); }
   .logo-sub { font-size:0.6rem; font-weight:400; letter-spacing:0.1em; text-transform:uppercase; color:#999; display:block; margin-top:-3px; }
@@ -46,12 +77,12 @@
   /* ── TAB BAR ── */
   .tabs {
     display:flex; gap:0; border-radius:6px; overflow:hidden;
-    border:1.5px solid #ddd; background:white;
+    border:1.5px solid var(--border); background:var(--card-bg);
   }
   .tab-btn {
     font-family:var(--sans); font-size:0.8rem; font-weight:500;
     padding:0.45rem 1.1rem; border:none; cursor:pointer;
-    background:white; color:#888;
+    background:var(--card-bg); color:#888;
     transition:all 0.15s; letter-spacing:0.02em;
     border-right:1px solid #eee;
   }
@@ -73,7 +104,7 @@
     font-weight:700; line-height:1.1; letter-spacing:-0.03em;
   }
   .page-hero h1 em { font-style:italic; color:var(--gold); }
-  .page-hero p { margin-top:0.8rem; font-size:0.95rem; font-weight:300; color:#666; line-height:1.7; max-width:520px; }
+  .page-hero p { margin-top:0.8rem; font-size:0.95rem; font-weight:300; color:var(--muted); line-height:1.7; max-width:520px; }
 
   /* ── SEARCH BOX (shared) ── */
   .search-wrap { max-width:860px; margin:0 auto; padding:0 2rem 1rem; position:relative; }
@@ -81,7 +112,7 @@
   .search-row input {
     flex:1; padding:0.9rem 1.1rem;
     font-family:var(--sans); font-size:0.95rem; font-weight:300;
-    background:white; border:1.5px solid #ddd; border-radius:4px;
+    background:var(--card-bg); border:1.5px solid var(--border); border-radius:4px;
     outline:none; color:var(--ink);
     transition:border-color 0.2s, box-shadow 0.2s;
   }
@@ -105,7 +136,7 @@
   .quick-picks button:hover { border-color:var(--gold); color:var(--gold); background:rgba(200,146,42,0.05); }
 
   /* ── TICKER ── */
-  .ticker-bar { overflow:hidden; border-top:1px solid #e0dbd0; border-bottom:1px solid #e0dbd0; padding:0.5rem 0; position:relative; }
+  .ticker-bar { overflow:hidden; border-top:1px solid var(--border); border-bottom:1px solid var(--border); padding:0.5rem 0; position:relative; }
   .ticker-bar::before, .ticker-bar::after { content:""; position:absolute; top:0; bottom:0; width:3rem; z-index:2; }
   .ticker-bar::before { left:0; background:linear-gradient(to right,var(--paper),transparent); }
   .ticker-bar::after  { right:0; background:linear-gradient(to left,var(--paper),transparent); }
@@ -117,7 +148,7 @@
 
   /* ── RESULT CARD ── */
   #result { max-width:860px; margin:0 auto; padding:0 2rem 1.5rem; display:none; }
-  .result-card { background:white; border:1.5px solid #e0dbd0; border-radius:6px; overflow:hidden; animation:slideUp 0.25s ease; }
+  .result-card { background:var(--card-bg); border:1.5px solid var(--border); border-radius:6px; overflow:hidden; animation:slideUp 0.25s ease; }
   @keyframes slideUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
   .result-header { padding:1.2rem 1.6rem; border-bottom:1px solid #f0ece4; display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; }
   .result-term { font-family:var(--serif); font-size:1.5rem; font-weight:700; letter-spacing:-0.02em; }
@@ -128,7 +159,7 @@
   .cat-afl      { background:var(--red-light); color:var(--red); }
   .result-body { padding:1.4rem 1.6rem; display:grid; grid-template-columns:1fr 1fr; gap:1.2rem; }
   .result-explain { grid-column:1/-1; font-size:0.97rem; font-weight:300; line-height:1.75; color:#333; }
-  .result-box { background:var(--paper); border:1px solid #e5e0d6; border-radius:4px; padding:1rem 1.2rem; }
+  .result-box { background:var(--paper); border:1px solid var(--border); border-radius:4px; padding:1rem 1.2rem; }
   .result-box h4 { font-size:0.68rem; font-weight:500; letter-spacing:0.1em; text-transform:uppercase; color:#999; margin-bottom:0.4rem; }
   .result-box p { font-size:0.88rem; font-weight:300; line-height:1.65; color:#555; }
   .result-box .big-num { font-family:var(--serif); font-size:1.9rem; font-weight:700; color:var(--gold); display:block; margin-bottom:0.15rem; }
@@ -143,7 +174,7 @@
   .section-label { font-size:0.7rem; font-weight:500; letter-spacing:0.12em; text-transform:uppercase; color:#aaa; margin-bottom:1.2rem; display:flex; align-items:center; gap:0.6rem; }
   .section-label::after { content:""; flex:1; height:1px; background:#e0dbd0; }
   .card-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:0.7rem; }
-  .glossary-card { background:white; border:1.5px solid #e5e0d6; border-radius:5px; padding:1rem 1.1rem; cursor:pointer; transition:all 0.15s; position:relative; overflow:hidden; }
+  .glossary-card { background:var(--card-bg); border:1.5px solid var(--border); border-radius:5px; padding:1rem 1.1rem; cursor:pointer; transition:all 0.15s; position:relative; overflow:hidden; }
   .glossary-card::before { content:""; position:absolute; top:0; left:0; right:0; height:3px; background:var(--gold); transform:scaleX(0); transform-origin:left; transition:transform 0.2s; }
   .glossary-card:hover { border-color:var(--gold); box-shadow:0 4px 14px rgba(0,0,0,0.06); transform:translateY(-2px); }
   .glossary-card:hover::before { transform:scaleX(1); }
@@ -170,7 +201,7 @@
   .dict-search-row input {
     flex:1; padding:0.85rem 1.1rem;
     font-family:var(--sans); font-size:0.92rem; font-weight:300;
-    background:white; border:1.5px solid #ddd; border-radius:4px;
+    background:var(--card-bg); border:1.5px solid var(--border); border-radius:4px;
     outline:none; color:var(--ink); transition:border-color 0.2s, box-shadow 0.2s;
   }
   .dict-search-row input:focus { border-color:var(--gold); box-shadow:0 0 0 3px rgba(200,146,42,0.1); }
@@ -178,7 +209,7 @@
   .dict-filter button {
     font-family:var(--sans); font-size:0.75rem; font-weight:500;
     padding:0.3rem 0.8rem; border-radius:999px; cursor:pointer;
-    border:1.5px solid #ddd; background:white; color:#888; transition:all 0.15s;
+    border:1.5px solid var(--border); background:var(--card-bg); color:#888; transition:all 0.15s;
   }
   .dict-filter button.active { border-color:var(--gold); background:var(--gold); color:white; }
   .dict-filter button:not(.active):hover { border-color:var(--gold); color:var(--gold); }
@@ -189,8 +220,8 @@
   .dict-table th {
     font-size:0.7rem; font-weight:500; letter-spacing:0.1em; text-transform:uppercase;
     color:#aaa; padding:0.65rem 1.2rem; text-align:left;
-    border-bottom:2px solid #e0dbd0; background:var(--paper);
-    position:sticky; top:0; z-index:10;
+    border-bottom:2px solid var(--border); background:var(--paper);
+    position:sticky; top:100px; z-index:10;
   }
   .dict-table td { padding:0.85rem 1.2rem; border-bottom:1px solid #f0ece4; font-size:0.88rem; font-weight:300; color:#333; vertical-align:middle; line-height:1.5; }
   .dict-table tr:hover td { background:#fffdf8; }
@@ -202,7 +233,7 @@
   .dict-table .en-highlight { background:rgba(200,146,42,0.2); border-radius:2px; padding:0 1px; }
   .dict-no-results { text-align:center; padding:3rem; color:#bbb; font-size:0.9rem; font-weight:300; }
 
-  .dict-table-wrap { background:white; border:1.5px solid #e0dbd0; border-radius:6px; overflow:hidden; max-height:520px; overflow-y:auto; }
+  .dict-table-wrap { background:var(--card-bg); border:1.5px solid var(--border); border-radius:6px; overflow:hidden; max-height:520px; overflow-y:auto; }
 
   /* ── FOOTER ── */
   footer { border-top:1px solid #ddd; padding:1.8rem 2rem; text-align:center; font-size:0.75rem; color:#bbb; font-weight:300; }
@@ -217,7 +248,7 @@
 
   /* ── SAGA ── */
   .saga-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:1rem; }
-  .saga-card { background:white; border:1.5px solid #e5e0d6; border-radius:5px; padding:1.4rem 1.5rem; position:relative; overflow:hidden; transition:all 0.15s; }
+  .saga-card { background:var(--card-bg); border:1.5px solid var(--border); border-radius:5px; padding:1.4rem 1.5rem; position:relative; overflow:hidden; transition:all 0.15s; }
   .saga-card:hover { border-color:var(--gold); box-shadow:0 4px 14px rgba(0,0,0,0.06); transform:translateY(-2px); }
   .saga-card::before { content:""; position:absolute; top:0; left:0; right:0; height:3px; background:var(--gold); }
   .saga-year { font-family:var(--serif); font-size:2rem; font-weight:700; color:var(--gold); line-height:1; margin-bottom:0.4rem; }
@@ -227,10 +258,10 @@
   /* ── QUIZ ── */
   .quiz-wrap { max-width:680px; margin:0 auto; padding:0 2rem 3rem; }
   .quiz-score-bar { display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; font-size:0.82rem; font-weight:500; color:#888; }
-  .quiz-card { background:white; border:1.5px solid #e0dbd0; border-radius:6px; overflow:hidden; }
+  .quiz-card { background:var(--card-bg); border:1.5px solid var(--border); border-radius:6px; overflow:hidden; }
   .quiz-question { font-family:var(--serif); font-size:1.3rem; font-weight:700; padding:1.8rem 1.8rem 1.2rem; line-height:1.4; letter-spacing:-0.01em; }
   .quiz-options { padding:0 1.2rem 1.2rem; display:flex; flex-direction:column; gap:0.5rem; }
-  .quiz-option { padding:0.85rem 1.1rem; background:var(--paper); border:1.5px solid #ddd; border-radius:4px; cursor:pointer; font-family:var(--sans); font-size:0.9rem; font-weight:400; text-align:left; transition:all 0.15s; }
+  .quiz-option { padding:0.85rem 1.1rem; background:var(--paper); border:1.5px solid var(--border); border-radius:4px; cursor:pointer; font-family:var(--sans); font-size:0.9rem; font-weight:400; text-align:left; transition:all 0.15s; }
   .quiz-option:hover:not(:disabled) { border-color:var(--gold); background:rgba(200,146,42,0.05); }
   .quiz-option.correct { border-color:var(--teal); background:var(--teal-light); color:var(--teal); font-weight:500; }
   .quiz-option.wrong { border-color:var(--red); background:var(--red-light); color:var(--red); }
@@ -238,11 +269,11 @@
   .quiz-feedback { padding:0 1.8rem 1.4rem; font-size:0.85rem; font-weight:300; line-height:1.65; color:#555; min-height:2rem; }
   .quiz-next-btn { margin:0 1.2rem 1.2rem; padding:0.75rem 1.4rem; background:var(--gold); color:white; border:none; border-radius:4px; cursor:pointer; font-family:var(--sans); font-size:0.9rem; font-weight:500; width:calc(100% - 2.4rem); transition:background 0.2s; }
   .quiz-next-btn:hover { background:#b07d22; }
-  .quiz-final-card { background:white; border:1.5px solid #e0dbd0; border-radius:6px; padding:3rem 2rem; text-align:center; }
+  .quiz-final-card { background:var(--card-bg); border:1.5px solid var(--border); border-radius:6px; padding:3rem 2rem; text-align:center; }
   .quiz-final-emoji { font-size:3.5rem; margin-bottom:1rem; }
   .quiz-final-title { font-family:var(--serif); font-size:1.8rem; font-weight:700; margin-bottom:0.5rem; }
   .quiz-final-score { font-family:var(--serif); font-size:3.5rem; font-weight:700; color:var(--gold); margin:0.5rem 0; }
-  .quiz-final-msg { font-size:0.95rem; font-weight:300; color:#666; margin-bottom:1.5rem; }
+  .quiz-final-msg { font-size:0.95rem; font-weight:300; color:var(--muted); margin-bottom:1.5rem; }
   .quiz-restart-btn { padding:0.85rem 2rem; background:var(--gold); color:white; border:none; border-radius:4px; cursor:pointer; font-family:var(--sans); font-size:0.95rem; font-weight:500; transition:background 0.2s; }
   .quiz-restart-btn:hover { background:#b07d22; }
 
@@ -257,7 +288,7 @@
   }
   .fraedast-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:0.8rem; }
   .fraedast-card {
-    background:white; border:1.5px solid #e5e0d6; border-radius:5px;
+    background:var(--card-bg); border:1.5px solid var(--border); border-radius:5px;
     padding:1.1rem 1.2rem; display:flex; flex-direction:column; gap:0.3rem;
     transition:all 0.15s; position:relative; overflow:hidden;
   }
@@ -265,13 +296,53 @@
   .fraedast-card-emoji { font-size:1.6rem; margin-bottom:0.2rem; }
   .fraedast-card-title { font-family:var(--serif); font-size:1rem; font-weight:700; line-height:1.3; }
   .fraedast-card-sub { font-size:0.75rem; font-weight:500; color:var(--gold); letter-spacing:0.04em; }
-  .fraedast-card-desc { font-size:0.82rem; font-weight:300; color:#666; line-height:1.6; margin-top:0.2rem; }
+  .fraedast-card-desc { font-size:0.82rem; font-weight:300; color:var(--muted); line-height:1.6; margin-top:0.2rem; }
   .fraedast-tag { display:inline-block; font-size:0.68rem; font-weight:500; letter-spacing:0.08em;
     text-transform:uppercase; padding:0.18rem 0.55rem; border-radius:999px;
     background:var(--teal-light); color:var(--teal); margin-top:auto; width:fit-content; }
   .fraedast-tag.tag-adv { background:var(--blue-light); color:var(--blue); }
   .fraedast-tag.tag-beg { background:#f0fdf4; color:#166534; }
   .fraedast-tag.tag-all { background:var(--cream); color:#7a5c1a; }
+
+
+  /* ── THEME TOGGLE ── */
+  .theme-toggle {
+    background:none; border:1.5px solid var(--border); border-radius:6px;
+    padding:0.3rem 0.55rem; cursor:pointer; font-size:1rem;
+    transition:all 0.2s; color:var(--ink);
+  }
+  .theme-toggle:hover { border-color:var(--gold); background:rgba(200,146,42,0.08); }
+
+  
+  .market-loading { color:var(--muted); font-size:0.78rem; animation: pulse 1.5s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:0.4} 50%{opacity:1} }
+
+
+  /* ── FYRIRTÆKI ── */
+  .fyrirtaeki-wrap { max-width:860px; margin:0 auto; padding:0 2rem 3rem; }
+  .fyrirtaeki-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:1rem; margin-bottom:2rem; }
+  .fyrirtaeki-card {
+    background:var(--card-bg); border:1.5px solid var(--border); border-radius:6px;
+    padding:1.4rem 1.5rem; transition:all 0.15s; cursor:default;
+    display:flex; flex-direction:column; gap:0.4rem;
+  }
+  .fyrirtaeki-card:hover { border-color:var(--gold); box-shadow:0 4px 16px rgba(0,0,0,0.07); transform:translateY(-2px); }
+  .fyrirtaeki-header { display:flex; align-items:center; justify-content:space-between; gap:0.5rem; margin-bottom:0.3rem; }
+  .fyrirtaeki-logo { font-size:1.8rem; }
+  .fyrirtaeki-tag { font-size:0.68rem; font-weight:500; letter-spacing:0.08em; text-transform:uppercase;
+    padding:0.2rem 0.6rem; border-radius:999px; }
+  .ftag-banki { background:var(--blue-light); color:var(--blue); }
+  .ftag-lifeyrir { background:var(--teal-light); color:var(--teal); }
+  .ftag-verdabref { background:#f5f0e8; color:#7a5c1a; }
+  .ftag-trygging { background:var(--red-light); color:var(--red); }
+  .ftag-annad { background:var(--cream); color:#555; }
+  .fyrirtaeki-name { font-family:var(--serif); font-size:1.1rem; font-weight:700; letter-spacing:-0.01em; }
+  .fyrirtaeki-full { font-size:0.78rem; color:var(--muted); font-weight:400; }
+  .fyrirtaeki-desc { font-size:0.84rem; font-weight:300; line-height:1.65; color:#555; margin-top:0.2rem; }
+  .fyrirtaeki-facts { display:flex; flex-wrap:wrap; gap:0.4rem; margin-top:0.5rem; }
+  .fyrirtaeki-fact { font-size:0.72rem; font-weight:400; color:var(--muted);
+    background:var(--paper); border:1px solid var(--border); border-radius:3px;
+    padding:0.18rem 0.5rem; }
 
 </style>
 </head>
@@ -282,15 +353,16 @@
     peningar<span>.</span>is
     <span class="logo-sub">fjármál á íslensku</span>
   </a>
-  <div class="tabs">
-    <button class="tab-btn active" onclick="switchTab('hugtok')" id="tab-hugtok">🔍 Hugtök</button>
-    <button class="tab-btn" onclick="switchTab('ordabok')" id="tab-ordabok">📖 Orðabók</button>
-    <button class="tab-btn" onclick="switchTab('reiknivel')" id="tab-reiknivel">📈 Reiknivél</button>
-    <button class="tab-btn" onclick="switchTab('saga')" id="tab-saga">📜 Saga</button>
-    <button class="tab-btn" onclick="switchTab('leikur')" id="tab-leikur">🎮 Leikur</button>
-    <button class="tab-btn" onclick="switchTab('fraedast')" id="tab-fraedast">📚 Fræðast</button>
-  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" title="Skipta um þema" id="themeBtn">🌙</button>
 </nav>
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('hugtok')" id="tab-hugtok">🔍 Hugtök</button>
+  <button class="tab-btn" onclick="switchTab('ordabok')" id="tab-ordabok">📖 Orðabók</button>
+  <button class="tab-btn" onclick="switchTab('reiknivel')" id="tab-reiknivel">📈 Reiknivél</button>
+  <button class="tab-btn" onclick="switchTab('saga')" id="tab-saga">📜 Saga</button>
+  <button class="tab-btn" onclick="switchTab('fraedast')" id="tab-fraedast">📚 Fræðast</button>
+  <button class="tab-btn" onclick="switchTab('fyrirtaeki')" id="tab-fyrirtaeki">🏦 Fyrirtæki</button>
+</div>
 
 <!-- ══ VIEW 1: HUGTÖK ══ -->
 <div class="view active" id="view-hugtok">
@@ -318,14 +390,14 @@
 
   <div class="ticker-bar">
     <div class="ticker">
-      <span>OMXI10 <b>+1.2%</b></span><span>USD/ISK <b>138.4</b></span>
-      <span>EUR/ISK <b>150.2</b></span><span class="neg">Verðbólga <b>5.1%</b></span>
-      <span>Stýrivextir <b>9.0%</b></span><span>OMXI15 <b>+0.8%</b></span>
-      <span>GBP/ISK <b>174.6</b></span><span class="neg">10 ára ríkisbréf <b>7.2%</b></span>
-      <span>OMXI10 <b>+1.2%</b></span><span>USD/ISK <b>138.4</b></span>
-      <span>EUR/ISK <b>150.2</b></span><span class="neg">Verðbólga <b>5.1%</b></span>
-      <span>Stýrivextir <b>9.0%</b></span><span>OMXI15 <b>+0.8%</b></span>
-      <span>GBP/ISK <b>174.6</b></span><span class="neg">10 ára ríkisbréf <b>7.2%</b></span>
+      <span>OMXI10 <b>+1.2%</b></span><span>USD/ISK <b>123.83</b></span>
+      <span>EUR/ISK <b>142.67</b></span><span class="neg">Verðbólga <b>5.2%</b></span>
+      <span>Stýrivextir <b>7.5%</b></span><span class="neg">OMXI15 <b>-0.9%</b></span>
+      <span>GBP/ISK <b>165.02</b></span><span class="neg">10 ára ríkisbréf <b>7.2%</b></span>
+      <span>OMXI10 <b>+1.2%</b></span><span>USD/ISK <b>123.83</b></span>
+      <span>EUR/ISK <b>142.67</b></span><span class="neg">Verðbólga <b>5.2%</b></span>
+      <span>Stýrivextir <b>7.5%</b></span><span class="neg">OMXI15 <b>-0.9%</b></span>
+      <span>GBP/ISK <b>165.02</b></span><span class="neg">10 ára ríkisbréf <b>7.2%</b></span>
     </div>
   </div>
 
@@ -354,7 +426,7 @@
       <button onclick="setDictFilter('is',this)">Íslenska → Enska</button>
     </div>
     <div class="dict-count" id="dictCount"></div>
-    <div class="dict-table-wrap" style="border:1.5px solid #e0dbd0; border-radius:6px; overflow:hidden;">
+    <div class="dict-table-wrap" style="border:1.5px solid var(--border); border-radius:6px; overflow:hidden;">
       <table class="dict-table">
         <thead>
           <tr><th style="width:45%">Enska</th><th>Íslenska</th></tr>
@@ -448,7 +520,7 @@
 </div>
 
 <!-- ══ VIEW 5: LEIKUR ══ -->
-<div class="view" id="view-leikur">
+<div class="view" id="view-leikur" style="display:none!important">
   <div class="page-hero">
     <h1>Fjármála<br><em>spurningakeppni</em></h1>
     <p>Prófaðu þekkingu þína á fjármálahugtökum!</p>
@@ -632,6 +704,145 @@
   </div>
 </div>
 
+<!-- ══ VIEW 7: FYRIRTÆKI ══ -->
+<div class="view" id="view-fyrirtaeki">
+  <div class="page-hero">
+    <h1>Íslensk<br><em>fjármálafyrirtæki</em></h1>
+    <p>Helstu fyrirtækin í íslensku fjármálakerfi — hverjir eru þeir og hvað gera þeir?</p>
+  </div>
+  <div class="fyrirtaeki-wrap">
+
+    <div class="section-label">Viðskiptabankar</div>
+    <div class="fyrirtaeki-grid">
+      <div class="fyrirtaeki-card">
+        <div class="fyrirtaeki-header"><span class="fyrirtaeki-logo">🏦</span><span class="fyrirtaeki-tag ftag-banki">Banki</span></div>
+        <div class="fyrirtaeki-name">Arion banki</div>
+        <div class="fyrirtaeki-full">Arion banki hf. — skráður á Nasdaq Iceland</div>
+        <div class="fyrirtaeki-desc">Stærsti banki Íslands að heildareignum. Veitir alla hefðbundna bankaþjónustu — lán, sparnað, fjárfestingar og tryggingar. Varð til úr rústum Kaupþings eftir hrunið 2008.</div>
+        <div class="fyrirtaeki-facts"><span class="fyrirtaeki-fact">Stofnað 2008</span><span class="fyrirtaeki-fact">~1.400 starfsmenn</span><span class="fyrirtaeki-fact">Skráður á markað</span></div>
+      </div>
+      <div class="fyrirtaeki-card">
+        <div class="fyrirtaeki-header"><span class="fyrirtaeki-logo">🏦</span><span class="fyrirtaeki-tag ftag-banki">Banki</span></div>
+        <div class="fyrirtaeki-name">Íslandsbanki</div>
+        <div class="fyrirtaeki-full">Íslandsbanki hf. — skráður á Nasdaq Iceland</div>
+        <div class="fyrirtaeki-desc">Annar stærsti banki landsins. Varð til úr Glitni eftir hrunið 2008. Leggur áherslu á einstaklingsþjónustu, lán og eignastýringu. Íslandssjóðir heyra undir bankann.</div>
+        <div class="fyrirtaeki-facts"><span class="fyrirtaeki-fact">Stofnað 2008</span><span class="fyrirtaeki-fact">~1.100 starfsmenn</span><span class="fyrirtaeki-fact">Skráður á markað</span></div>
+      </div>
+      <div class="fyrirtaeki-card">
+        <div class="fyrirtaeki-header"><span class="fyrirtaeki-logo">🏦</span><span class="fyrirtaeki-tag ftag-banki">Banki</span></div>
+        <div class="fyrirtaeki-name">Landsbankinn</div>
+        <div class="fyrirtaeki-full">Landsbankinn hf.</div>
+        <div class="fyrirtaeki-desc">Þriðji stærsti banki landsins og í meirihlutaeigu ríkisins. Varð til úr nýja Landsbankanum eftir hrunið. Einn af elstu bönkum landsins með rætur aftur til 1886.</div>
+        <div class="fyrirtaeki-facts"><span class="fyrirtaeki-fact">Stofnað 1886</span><span class="fyrirtaeki-fact">~1.000 starfsmenn</span><span class="fyrirtaeki-fact">Ríkisbanki að hluta</span></div>
+      </div>
+      <div class="fyrirtaeki-card">
+        <div class="fyrirtaeki-header"><span class="fyrirtaeki-logo">🏦</span><span class="fyrirtaeki-tag ftag-banki">Banki</span></div>
+        <div class="fyrirtaeki-name">Kvika banki</div>
+        <div class="fyrirtaeki-full">Kvika banki hf. — skráður á Nasdaq Iceland</div>
+        <div class="fyrirtaeki-desc">Minni en sértækur banki sem leggur áherslu á fjárfestingarbankaþjónustu, eignastýringu og einkabankaþjónustu fyrir stærri viðskiptavini og fyrirtæki.</div>
+        <div class="fyrirtaeki-facts"><span class="fyrirtaeki-fact">Stofnað 2000</span><span class="fyrirtaeki-fact">~200 starfsmenn</span><span class="fyrirtaeki-fact">Skráður á markað</span></div>
+      </div>
+    </div>
+
+    <div class="section-label">Lífeyrissjóðir</div>
+    <div class="fyrirtaeki-grid">
+      <div class="fyrirtaeki-card">
+        <div class="fyrirtaeki-header"><span class="fyrirtaeki-logo">🏛️</span><span class="fyrirtaeki-tag ftag-lifeyrir">Lífeyrir</span></div>
+        <div class="fyrirtaeki-name">LSR</div>
+        <div class="fyrirtaeki-full">Lífeyrissjóður starfsmanna ríkisins</div>
+        <div class="fyrirtaeki-desc">Stærsti lífeyrissjóður Íslands. Sér um lífeyrissparnað ríkisstarfsmanna — kennarar, læknar, lögreglumenn og aðrir opinberir starfsmenn. Eignir nema hundruðum milljörðum króna.</div>
+        <div class="fyrirtaeki-facts"><span class="fyrirtaeki-fact">Stofnað 1946</span><span class="fyrirtaeki-fact">Yfir 50.000 félagsmenn</span></div>
+      </div>
+      <div class="fyrirtaeki-card">
+        <div class="fyrirtaeki-header"><span class="fyrirtaeki-logo">🏛️</span><span class="fyrirtaeki-tag ftag-lifeyrir">Lífeyrir</span></div>
+        <div class="fyrirtaeki-name">Gildi</div>
+        <div class="fyrirtaeki-full">Gildi — lífeyrissjóður</div>
+        <div class="fyrirtaeki-desc">Einn stærsti lífeyrissjóður á almennum markaði. Varð til við sameiningu Lífeyrissjóðs verslunarmanna og Lífeyrissjóðs iðnaðarmanna. Fjárfestir víða innanlands og erlendis.</div>
+        <div class="fyrirtaeki-facts"><span class="fyrirtaeki-fact">Yfir 70.000 félagsmenn</span><span class="fyrirtaeki-fact">Fjárfestir um heiminn</span></div>
+      </div>
+      <div class="fyrirtaeki-card">
+        <div class="fyrirtaeki-header"><span class="fyrirtaeki-logo">🏛️</span><span class="fyrirtaeki-tag ftag-lifeyrir">Lífeyrir</span></div>
+        <div class="fyrirtaeki-name">Festa</div>
+        <div class="fyrirtaeki-full">Festa lífeyrissjóður</div>
+        <div class="fyrirtaeki-desc">Lífeyrissjóður starfsmanna í fjármálageiranum og tengdum fyrirtækjum. Þekktur fyrir vandvirkni í fjárfestingum og góða þjónustu við félagsmenn.</div>
+        <div class="fyrirtaeki-facts"><span class="fyrirtaeki-fact">Fjármálageirinn</span><span class="fyrirtaeki-fact">Sterk ávöxtun</span></div>
+      </div>
+      <div class="fyrirtaeki-card">
+        <div class="fyrirtaeki-header"><span class="fyrirtaeki-logo">🏛️</span><span class="fyrirtaeki-tag ftag-lifeyrir">Lífeyrir</span></div>
+        <div class="fyrirtaeki-name">Birta</div>
+        <div class="fyrirtaeki-full">Birta lífeyrissjóður</div>
+        <div class="fyrirtaeki-desc">Lífeyrissjóður sem þjónar fjölbreyttum hópi félagsmanna. Leggur áherslu á langtímafjárfestingar í innviðum, fasteignum og hlutabréfum innanlands og erlendis.</div>
+        <div class="fyrirtaeki-facts"><span class="fyrirtaeki-fact">Fjölbreyttir félagsmenn</span><span class="fyrirtaeki-fact">Langtímasjónarmiðið</span></div>
+      </div>
+    </div>
+
+    <div class="section-label">Verðbréfafyrirtæki &amp; eignastýring</div>
+    <div class="fyrirtaeki-grid">
+      <div class="fyrirtaeki-card">
+        <div class="fyrirtaeki-header"><span class="fyrirtaeki-logo">📊</span><span class="fyrirtaeki-tag ftag-verdabref">Verðbréf</span></div>
+        <div class="fyrirtaeki-name">Nasdaq Iceland</div>
+        <div class="fyrirtaeki-full">Nasdaq Iceland hf. — Kauphöll Íslands</div>
+        <div class="fyrirtaeki-desc">Hlutabréfamarkaður Íslands þar sem fyrirtæki eins og Marel, Icelandair og Arion banki eru skráð. Hluti af alþjóðlega Nasdaq samstæðunni. Um 20 fyrirtæki eru skráð.</div>
+        <div class="fyrirtaeki-facts"><span class="fyrirtaeki-fact">OMXI10 og OMXI15</span><span class="fyrirtaeki-fact">~20 skráð fyrirtæki</span></div>
+      </div>
+      <div class="fyrirtaeki-card">
+        <div class="fyrirtaeki-header"><span class="fyrirtaeki-logo">📊</span><span class="fyrirtaeki-tag ftag-verdabref">Eignastýring</span></div>
+        <div class="fyrirtaeki-name">Stefnir</div>
+        <div class="fyrirtaeki-full">Stefnir hf. — eignarhaldssjóðir</div>
+        <div class="fyrirtaeki-desc">Eitt stærsta fjárfestingarfyrirtæki Íslands í eigu Landsbankans. Rekur fjölda hlutabréfa-, skuldabréfa- og blönduðra sjóða sem einstaklingar og lífeyrissjóðir fjárfesta í.</div>
+        <div class="fyrirtaeki-facts"><span class="fyrirtaeki-fact">Í eigu Landsbankans</span><span class="fyrirtaeki-fact">Fjöldi sjóða</span></div>
+      </div>
+      <div class="fyrirtaeki-card">
+        <div class="fyrirtaeki-header"><span class="fyrirtaeki-logo">📊</span><span class="fyrirtaeki-tag ftag-verdabref">Eignastýring</span></div>
+        <div class="fyrirtaeki-name">Íslandssjóðir</div>
+        <div class="fyrirtaeki-full">Íslandssjóðir hf.</div>
+        <div class="fyrirtaeki-desc">Fjárfestingarsjóðafyrirtæki í eigu Íslandsbanka. Rekur hlutabréfasjóði, skuldabréfasjóði og blönduð sjóðaúrræði. Vinsælt val meðal einstaklinga sem vilja sparnaðarsjóði.</div>
+        <div class="fyrirtaeki-facts"><span class="fyrirtaeki-fact">Í eigu Íslandsbanka</span><span class="fyrirtaeki-fact">Einstaklingsmiðað</span></div>
+      </div>
+      <div class="fyrirtaeki-card">
+        <div class="fyrirtaeki-header"><span class="fyrirtaeki-logo">📊</span><span class="fyrirtaeki-tag ftag-verdabref">Verðbréf</span></div>
+        <div class="fyrirtaeki-name">Auður Capital</div>
+        <div class="fyrirtaeki-full">Auður Capital hf.</div>
+        <div class="fyrirtaeki-desc">Óháð fjárfestingarbanki og eignastýringarfyrirtæki. Sérhæfir sig í fyrirtækjaráðgjöf, samruna og yfirtökum (M&amp;A) og eignastýringu fyrir stofnanir og einstaklinga.</div>
+        <div class="fyrirtaeki-facts"><span class="fyrirtaeki-fact">Óháð fyrirtæki</span><span class="fyrirtaeki-fact">M&amp;A ráðgjöf</span></div>
+      </div>
+    </div>
+
+    <div class="section-label">Tryggingafélög &amp; annað</div>
+    <div class="fyrirtaeki-grid">
+      <div class="fyrirtaeki-card">
+        <div class="fyrirtaeki-header"><span class="fyrirtaeki-logo">🛡️</span><span class="fyrirtaeki-tag ftag-trygging">Trygging</span></div>
+        <div class="fyrirtaeki-name">Vörður</div>
+        <div class="fyrirtaeki-full">Vörður tryggingar hf.</div>
+        <div class="fyrirtaeki-desc">Eitt stærsta tryggingafélag Íslands. Býður upp á bílatryggingar, hústryggingar, líftryggingar og slysatryggingar. Skráð á Nasdaq Iceland.</div>
+        <div class="fyrirtaeki-facts"><span class="fyrirtaeki-fact">Skráð á markað</span><span class="fyrirtaeki-fact">Líf- og skaðatryggingar</span></div>
+      </div>
+      <div class="fyrirtaeki-card">
+        <div class="fyrirtaeki-header"><span class="fyrirtaeki-logo">🛡️</span><span class="fyrirtaeki-tag ftag-trygging">Trygging</span></div>
+        <div class="fyrirtaeki-name">TM tryggingar</div>
+        <div class="fyrirtaeki-full">Tryggingamiðstöðin hf.</div>
+        <div class="fyrirtaeki-desc">Eitt elsta og stærsta tryggingafélag Íslands með langa sögu. Sérhæfir sig í skaðatryggingum fyrir einstaklinga og fyrirtæki, þar með bíl-, hús- og ferðatryggingar.</div>
+        <div class="fyrirtaeki-facts"><span class="fyrirtaeki-fact">Stofnað 1930</span><span class="fyrirtaeki-fact">Skaðatryggingar</span></div>
+      </div>
+      <div class="fyrirtaeki-card">
+        <div class="fyrirtaeki-header"><span class="fyrirtaeki-logo">🏗️</span><span class="fyrirtaeki-tag ftag-annad">Annað</span></div>
+        <div class="fyrirtaeki-name">Seðlabanki Íslands</div>
+        <div class="fyrirtaeki-full">Seðlabanki Íslands — miðlægi banki ríkisins</div>
+        <div class="fyrirtaeki-desc">Miðlægi banki Íslands sem setur stýrivexti, gefur út krónur og vinnur að verðlagsstöðugleika. Heldur einnig utan um gjaldeyrisforða og fylgist með fjármálastöðugleika.</div>
+        <div class="fyrirtaeki-facts"><span class="fyrirtaeki-fact">Stofnað 1961</span><span class="fyrirtaeki-fact">Ríkisstofnun</span><span class="fyrirtaeki-fact">Stýrir vöxtum</span></div>
+      </div>
+      <div class="fyrirtaeki-card">
+        <div class="fyrirtaeki-header"><span class="fyrirtaeki-logo">🏠</span><span class="fyrirtaeki-tag ftag-annad">Húsnæði</span></div>
+        <div class="fyrirtaeki-name">Íbúðalánasjóður</div>
+        <div class="fyrirtaeki-full">Íbúðalánasjóður (ÍLS)</div>
+        <div class="fyrirtaeki-desc">Ríkisstofnun sem veitir íbúðalán á hagstæðum kjörum, sérstaklega fyrir fyrstu kaupendur. Leikur mikilvægan þátt á íslenska fasteignamarkaðnum með lægri vöxtum en hjá bönkum.</div>
+        <div class="fyrirtaeki-facts"><span class="fyrirtaeki-fact">Ríkisstofnun</span><span class="fyrirtaeki-fact">Fyrstu kaupendur</span><span class="fyrirtaeki-fact">Lægri vextir</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 <footer>
   Gerður af nemanda í fjármálaverkfræði — <strong>ekki fjárfestingarráðgjöf</strong>
 </footer>
@@ -647,7 +858,6 @@ function switchTab(name) {
   document.getElementById("view-" + name).classList.add("active");
   document.getElementById("tab-" + name).classList.add("active");
   if (name === "ordabok" && !dictLoaded) initDict();
-  if (name === "leikur") startQuiz();
 }
 
 // ── GLOSSARY CARDS ───────────────────────────────────────────────
@@ -659,11 +869,19 @@ const glossary = [
   {term:"ETF",hint:"Karfa af mörgum hlutabréfum í einni fjárfestingu",cat:"hlutabref"},
   {term:"P/E hlutfall",hint:"Verð hlutabréfs deilt með hagnaði á hlut",cat:"hlutabref"},
   {term:"Lífeyrissjóður",hint:"Skyldulegur sparnaður til elli á Íslandi",cat:"lifeyrir"},
-  {term:"Vaxtaþekja",hint:"Getur fyrirtæki borgað vexti sína?",cat:"grunnur"},
   {term:"Arðsemi",hint:"Hlutfall hagnaðar af fjárfestingu",cat:"grunnur"},
-  {term:"Afleiður",hint:"Fjármálasamningar sem reiða sig á verð annars eignar",cat:"afl"},
   {term:"Sjóðstreymi",hint:"Peningaflæði inn og út úr fyrirtæki",cat:"grunnur"},
   {term:"Stýrivextir",hint:"Seðlabankinn setur þessa vexti til að stjórna verðbólgu",cat:"grunnur"},
+  {term:"Rafmynt",hint:"Stafrænn gjaldmiðill án miðstýringar",cat:"hlutabref"},
+  {term:"Hlutafélag (hf.)",hint:"Fyrirtæki með hlutabréf sem hægt er að kaupa og selja",cat:"hlutabref"},
+  {term:"Einkahlutafélag (ehf.)",hint:"Algengasta fyrirtækjaformið á Íslandi",cat:"hlutabref"},
+  {term:"Verðtrygging",hint:"Lán bundið við verðlag — einstakt íslenskt fyrirbæri",cat:"grunnur"},
+  {term:"Tekjuskattur",hint:"Skattur á launatekjur",cat:"grunnur"},
+  {term:"Séreignarsparnaður",hint:"Valfrjáls sparnaður með skattafslátt",cat:"lifeyrir"},
+  {term:"Arður",hint:"Hlutdeild hagnaðar sem fyrirtæki greiðir hluthöfum",cat:"hlutabref"},
+  {term:"GDP",hint:"Heildarverðmæti allrar framleiðslu í landinu",cat:"grunnur"},
+  {term:"IPO",hint:"Þegar fyrirtæki er skráð á hlutabréfamarkað í fyrsta sinn",cat:"hlutabref"},
+  {term:"Dreifing fjárfestinga",hint:"Dreifa fjárfestingum til að minnka áhættu",cat:"hlutabref"},
 ];
 
 const grid = document.getElementById("cardGrid");
@@ -693,7 +911,7 @@ const hugtokData = [
     category: "grunnur",
     explanation: "Vextir eru verð þess að lána eða fá lánað peninga. Þegar þú tekur lán borgðar þú vexti til bankans. Þegar þú sparar, greiðir bankinn þér vexti.",
     example: "Ef þú tekur 1.000.000 kr bílalán með 8% vöxtum, borgar þú um 80.000 kr í vexti á fyrsta árinu.",
-    keyNumber: "7.25%",
+    keyNumber: "7.5%",
     keyNumberLabel: "Stýrivextir Seðlabanka Íslands (2026)",
     tip: "Alltaf borga skuldir með hæstu vöxtum fyrst — það sparar þér mest."
   },
@@ -819,8 +1037,8 @@ const hugtokData = [
     category: "grunnur",
     explanation: "Gengi gjaldmiðils er verð hans miðað við annan gjaldmiðil. Þegar krónan veikist þarf fleiri krónur til að kaupa dollara eða evrur, sem gerir innfluttar vörur dýrari.",
     example: "Ef gengi USD/ISK er 138 þýðir það að 1 Bandaríkjadalur kostar 138 krónur. Ef þú kaupir vöru á Amazon fyrir $100 kostar hún 13.800 kr.",
-    keyNumber: "138",
-    keyNumberLabel: "USD/ISK gengi (2026)",
+    keyNumber: "123.83",
+    keyNumberLabel: "USD/ISK gengi (mars 2026)",
     tip: "Ferðalag til útlanda verður dýrara þegar krónan veikist — fylgstu með genginu!"
   },
   {
@@ -837,16 +1055,142 @@ const hugtokData = [
     category: "grunnur",
     explanation: "Vaxtastig lýsir því hversu háir eða lágir vextir eru almennt í hagkerfinu. Hátt vaxtastig gerir lán dýrari en sparnaður gefur betri ávöxtun.",
     example: "Þegar Seðlabankinn hækkaði stýrivexti í 9% árið 2023, hækkuðu vextir á nýjum íbúðalánum úr um 5% í yfir 9% á nokkrum mánuðum.",
-    keyNumber: "7.25%",
-    keyNumberLabel: "Núverandi stýrivextir (febrúar 2026)",
+    keyNumber: "7.5%",
+    keyNumberLabel: "Núverandi stýrivextir (mars 2026)",
     tip: "Þegar vaxtastig er hátt er oft gott tækifæri til að festa sparnað í bundnum innlánum."
+  },
+  {
+    term: "Fasteignalán",
+    category: "grunnur",
+    explanation: "Fasteignalán (íbúðalán) er lán sem tekið er til að kaupa fasteign. Fasteignin sjálf er sett að veði — ef lánið er ekki greitt getur bankinn tekið eignina.",
+    example: "Þú kaupir íbúð á 50 millj. kr. Bankinn lætur þig fá 40 millj. kr að láni (80%) og þú greiðir 10 millj. kr í handgjald (20%).",
+    keyNumber: "80%",
+    keyNumberLabel: "Hámarkshlutfall láns af fasteignaverði",
+    tip: "Greiddu meira handgjald ef þú getur — það sparar þér gríðarlega mikið í vöxtum."
+  },
+  {
+    term: "Tekjuskattur",
+    category: "grunnur",
+    explanation: "Tekjuskattur er skattur sem greiddur er af launatekjum. Á Íslandi er skattkerfið stigskipt — lægra hlutfall af lágum launum og hærra hlutfall af hærri launum.",
+    example: "Á Íslandi eru þrjár skattþrepur: 31,45% upp að um 450 þús. kr á mánuði, 37,95% upp að 1,2 millj. kr og 46,25% yfir það.",
+    keyNumber: "37.95%",
+    keyNumberLabel: "Miðhlutfall tekjuskatts á Íslandi",
+    tip: "Persónuafslátturinn (um 70 þús. kr á mánuði) lækkar skattinn þinn verulega — gakktu úr skugga um að þú nýtir hann."
+  },
+  {
+    term: "Fjármagnstekjuskattur",
+    category: "grunnur",
+    explanation: "Fjármagnstekjuskattur er skattur á tekjur af fjármagni — þ.e. arð af hlutabréfum, vaxtatekjur af sparnaði og hagnað af sölu hlutabréfa eða fasteigna.",
+    example: "Ef þú kaupir hlutabréf á 100 þús. kr og selur á 150 þús. kr, er hagnaðurinn 50 þús. kr og þú greiðir 22% = 11 þús. kr í fjármagnstekjuskatt.",
+    keyNumber: "22%",
+    keyNumberLabel: "Fjármagnstekjuskattur á Íslandi",
+    tip: "Hagnaður af sölu aðalíbúðar er undanþeginn fjármagnstekjuskatti ef þú hefur búið þar í 2 ár."
+  },
+  {
+    term: "Séreignarsparnaður",
+    category: "lifeyrir",
+    explanation: "Séreignarsparnaður er valfrjáls viðbót við lögbundinn lífeyrissparnað. Þú getur lagt allt að 4% af launum í séreign og fengið skattafslátt af því.",
+    example: "Ef þú leggur 4% af 500 þús. kr launum (20 þús. kr) í séreign á mánuði, færð þú 22% skattafslátt (4.400 kr) — ríkið er í raun að greiða hluta af sparnaðinum.",
+    keyNumber: "4%",
+    keyNumberLabel: "Hámarkshlutfall með skattafslátt",
+    tip: "Séreignarsparnaður er eitt besta sparnaðarform á Íslandi vegna skattafsláttarins — nýttu hann!"
+  },
+  {
+    term: "Arður",
+    category: "hlutabref",
+    explanation: "Arður er hlutdeild hagnaðar sem fyrirtæki greiðir til hluthafa sinna. Ekki öll fyrirtæki greiða arð — sum setja hagnað frekar í vöxt og þróun.",
+    example: "Ef þú átt 1.000 hluti í fyrirtæki og það greiðir 50 kr arð á hvern hlut, færð þú 50.000 kr greiddar beint inn á reikning þinn.",
+    keyNumber: "2-5%",
+    keyNumberLabel: "Dæmigerð arðsemi hlutabréfa á ári",
+    tip: "Útgreiðsluhlutfall (payout ratio) sýnir hvað mikið fyrirtæki greiðir í arð af hagnaði — of hátt hlutfall getur verið ósjálfbært."
+  },
+  {
+    term: "Markaðsvirði",
+    category: "hlutabref",
+    explanation: "Markaðsvirði (market cap) er heildarverd fyrirtækis á hlutabréfamarkaði. Það er reiknað með því að margfalda fjölda hluta með hlutabréfaverði.",
+    example: "Ef Apple hefur 15 milljarða hluti og hvert hlutabréf kostar 200 dollara, er markaðsvirðið 3.000 milljarðar dollara — þ.e. 3 trilljónar.",
+    keyNumber: "3 trilljónar $",
+    keyNumberLabel: "Markaðsvirði Apple (2024)",
+    tip: "Large-cap = yfir 10 ma. $, Mid-cap = 2-10 ma. $, Small-cap = undir 2 ma. $."
+  },
+  {
+    term: "Dreifing fjárfestinga",
+    category: "hlutabref",
+    explanation: "Dreifing (diversification) þýðir að dreifa fjárfestingum á margar eignir, markaði og geira til að minnka áhættu. Gamla ráðið: ekki setja öll eggin í eina körfu.",
+    example: "Í stað þess að setja allt í eitt hlutabréf getur þú keypt ETF sem inniheldur 500 hlutabréf. Þá eyðileggur fall eins fyrirtækis ekki sparnaðinn þinn.",
+    keyNumber: "15-20",
+    keyNumberLabel: "Fjöldi hlutabréfa til að ná góðri dreifingu",
+    tip: "Alþjóðleg dreifing er líka mikilvæg — hlutabréfamarkaðir í mismunandi löndum hreyfist ekki alltaf saman."
+  },
+  {
+    term: "IPO",
+    category: "hlutabref",
+    explanation: "IPO (Initial Public Offering) er þegar fyrirtæki er skráð á hlutabréfamarkað í fyrsta sinn og gefur út hlutabréf til almennings. Þetta er leið fyrirtækja til að afla fjár.",
+    example: "Þegar Össur skráðist á Kauphöll Íslands gat almenningur keypt hluti í fyrirtækinu í fyrsta sinn og gerst hluthafi í íslenska gönguliðafyrirtækinu.",
+    keyNumber: "Á bilinu",
+    keyNumberLabel: "IPO verð er oft hærra en gengi síðar",
+    tip: "Rannsóknir sýna að IPO hlutabréf skila oft lægri ávöxtun en markaðurinn til langs tíma."
+  },
+  {
+    term: "Seðlabanki",
+    category: "grunnur",
+    explanation: "Seðlabanki er miðlægi banki ríkisins sem stjórnar peningamálum landsins. Hann setur stýrivexti, gefur út gjaldmiðilinn og vinnur að stöðugleika verðlags.",
+    example: "Seðlabanki Íslands hækkaði stýrivexti í 9% á árabilinu 2022-2023 til að berjast gegn verðbólgu. Þetta gerði lán dýrari en hjálpaði að lækka verðbólguna.",
+    keyNumber: "7.5%",
+    keyNumberLabel: "Stýrivextir Seðlabanka Íslands (mars 2026)",
+    tip: "Þegar seðlabankinn hækkar vexti er það merki um að verðbólga sé of há og hagkerfið þurfi að kólna."
+  },
+  {
+    term: "Þjóðarframleiðsla (GDP)",
+    category: "grunnur",
+    explanation: "Þjóðarframleiðsla (Gross Domestic Product) mælir heildarvirði allra vara og þjónustu sem framleiddar eru í landi á ári. Það er helsta mælikvarðinn á stærð hagkerfis.",
+    example: "GDP á Íslandi er um 3.500 milljarðar króna á ári. GDP á mann er um 8 millj. kr — eitt hæsta í heiminum — sem endurspeglar há lífskjör.",
+    keyNumber: "3.500 ma. kr",
+    keyNumberLabel: "GDP á Íslandi (2024)",
+    tip: "Neikvæður GDP vöxtur í tvö ársfjórðungar í röð er skilgreining á samdráttarskeiði (recession)."
+  },
+  {
+    term: "Lausafjárstaða",
+    category: "grunnur",
+    explanation: "Lausafjárstaða (liquidity) lýsir því hversu auðvelt er að breyta eign í peninga fljótt án þess að tapa verðmæti. Hlutabréf eru mjög lausar eignir, fasteignir minna.",
+    example: "Þú getur selt hlutabréf á nokkrum sekúndum. En að selja íbúð getur tekið mánuði — fasteignir hafa því lélega lausafjárstöðu.",
+    keyNumber: "3-6 mán",
+    keyNumberLabel: "Mælt neyðarsjóðsframlag í lausum peningum",
+    tip: "Alltaf hafa 3-6 mánaða útgjöld í lausum sparnaði sem neyðarsjóð áður en þú fjárfestir."
+  },
+  {
+    term: "Ávöxtunarkrafa",
+    category: "grunnur",
+    explanation: "Ávöxtunarkrafa er sú ávöxtun sem fjárfestar krefjast til að taka áhættu á fjárfestingu. Hærri áhætta þýðir hærri ávöxtunarkröfu.",
+    example: "Ríkisskuldabréf gefa lága ávöxtun vegna lágrar áhættu. Hlutabréf í lítilli og óþekktri fyrirtæki þurfa að bjóða upp á mun hærri ávöxtun til að laða að fjárfesta.",
+    keyNumber: "5-8%",
+    keyNumberLabel: "Dæmigerð ávöxtunarkrafa hlutabréfa",
+    tip: "Ávöxtunarkrafa og verð eru í öfugum hlutföllum — þegar krafa hækkar, lækkar verð eigna."
+  },
+  {
+    term: "Vogunarsjóður",
+    category: "afl",
+    explanation: "Vogunarsjóður (hedge fund) er fjárfestingarsjóður sem notar flóknar aðferðir til að ná ávöxtun óháð markaðsþróun. Þeir taka oft bæði kaup- og sölustöður samtímis.",
+    example: "Ray Dalio's Bridgewater Associates er stærsti vogunarsjóður í heiminum með yfir 150 milljarða dala í umsjón. Sjóðirnir eru venjulega aðeins aðgengilegir ríkum fjárfestum.",
+    keyNumber: "2 / 20",
+    keyNumberLabel: "Dæmigerð þóknun: 2% á ári + 20% af hagnaði",
+    tip: "Vogunarsjóðir slá oft ekki einfalda index-sjóði til langs tíma þrátt fyrir flóknar aðferðir."
+  },
+  {
+    term: "Skuldsetning",
+    category: "afl",
+    explanation: "Skuldsetning (leverage) þýðir að nota lánsfé til að stækka fjárfestingu umfram eigið fé. Þetta getur margfaldað bæði hagnað og tap.",
+    example: "Þú fjárfestir 1 millj. kr en tekur að láni 4 millj. kr viðbót (5x skuldsetning). Ef fjárfestingin hækkar um 10% er hagnaðurinn 50% af eigin fé — en ef hún lækkar um 10% tapar þú 50%.",
+    keyNumber: "2-5x",
+    keyNumberLabel: "Algeng skuldsetning á fasteignamarkaði",
+    tip: "Skuldsetning er tvísýnt sverð — notaðu hana aðeins ef þú skilur áhættuna að fullu."
   },
   {
     term: "Stýrivextir",
     category: "grunnur",
     explanation: "Stýrivextir eru vextir sem Seðlabanki Íslands setur og hafa áhrif á alla vexti í landinu. Þegar verðbólga er há, hækkar seðlabankinn vexti til að kæla hagkerfið.",
     example: "Þegar Seðlabankinn hækkaði stýrivexti í 9% árið 2023, hækkuðu vextir á öllum lánum — bæði íbúðalánum og bíllánum.",
-    keyNumber: "7.25%",
+    keyNumber: "7.5%",
     keyNumberLabel: "Stýrivextir á Íslandi (2026)",
     tip: "Hærri stýrivextir = dýrari lán en betri sparivextir. Lægri stýrivextir = ódýrari lán."
   },
@@ -1151,6 +1495,29 @@ function showResult() {
 
 // Start quiz when tab is opened
 const origSwitchTab = switchTab;
+
+
+// ── ÞEMA (DARK/LIGHT MODE) ────────────────────────────────────────
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  document.getElementById('themeBtn').textContent = isDark ? '🌙' : '☀️';
+  localStorage.setItem('peningar-theme', isDark ? 'light' : 'dark');
+}
+// Load saved theme
+(function() {
+  const saved = localStorage.getItem('peningar-theme') || 'light';
+  if (saved === 'dark') {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    document.addEventListener('DOMContentLoaded', () => {
+      const btn = document.getElementById('themeBtn');
+      if (btn) btn.textContent = '☀️';
+    });
+  }
+})();
+
+
 
 </script>
 </body>
