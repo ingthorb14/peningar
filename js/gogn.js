@@ -37,12 +37,36 @@ const SKATTUR = {
   lifeyrirAtvinnurekandi: 0.115,
   fjarmagnstekjuskattur: 0.22,
   heimild: "https://www.skatturinn.is/einstaklingar/stadgreidsla/stadgreidsla/2026/",
+  // Skattþrepin innihalda meðalútsvar (14,94%). Staðgreiðsla notar sama útsvar um allt land;
+  // mismunur sveitarfélaga er gerður upp við álagningu árið eftir.
+  medalutsvar: 0.1494,
+  // Útsvar 2026 — Samband íslenskra sveitarfélaga, „Útsvarsprósentur sveitarfélaga“ (Excel)
+  utsvar: {
+    medaltal:       { nafn: "Landsmeðaltal",  hlutfall: 0.1494 },
+    reykjavik:      { nafn: "Reykjavík",      hlutfall: 0.1497 },
+    kopavogur:      { nafn: "Kópavogur",      hlutfall: 0.1493 },
+    hafnarfjordur:  { nafn: "Hafnarfjörður",  hlutfall: 0.1493 },
+    reykjanesbaer:  { nafn: "Reykjanesbær",   hlutfall: 0.1497 },
+    akureyri:       { nafn: "Akureyri",       hlutfall: 0.1497 },
+    gardabaer:      { nafn: "Garðabær",       hlutfall: 0.1471 },
+  },
+  utsvarHeimild: "https://www.samband.is/tekjustofnar",
 };
 
 // Lánareglur Seðlabankans
 const LANAREGLUR = {
   vedhlutfall: 0.80, vedhlutfallFyrstu: 0.85,
   greidslubyrdi: 0.35, greidslubyrdiFyrstu: 0.40,
+  // Skattfrjáls ráðstöfun séreignar inn á íbúðalán (2026): allt að 4% frá launþega (hám. 333.000 kr/ári)
+  // + 2% frá launagreiðanda (hám. 167.000 kr/ári), samtals 500.000 kr á ári á einstakling, í mest 10 ár.
+  sereign: {
+    launthegi: 0.04, hamarkLaunthegi: 333000,
+    atvinnurekandi: 0.02, hamarkAtvinnurekandi: 167000,
+    arMest: 10,
+    heimild: "https://island.is/sereignarsparnadur-radstofun-inn-a-husnaedislan",
+  },
+  // Stimpilgjald af íbúðarhúsnæði (lög nr. 138/2013, 5. gr.): 0,8% af fasteignamati, hálft við fyrstu kaup
+  stimpilgjald: { einstaklingur: 0.008, fyrstuKaup: 0.004, heimild: "https://www.althingi.is/lagas/nuna/2013138.html" },
 };
 
 const FLOKKAR = {

@@ -46,7 +46,9 @@ const TABS = ["hugtok", "ordabok", "reiknivelar", "prof", "saga", "fraedast", "f
 const onEnter = {};
 
 function route() {
-  const [tab, sub] = decodeURIComponent(location.hash.slice(1)).split("/");
+  // #flipi/undirsíða?inntak=gildi — fyrirspurnin geymir inntak reiknivéla (deilanlegar slóðir)
+  const [slod, fyrirspurn = ""] = location.hash.slice(1).split("?");
+  const [tab, sub] = decodeURIComponent(slod).split("/");
   const name = TABS.includes(tab) ? tab : "hugtok";
   $$(".view").forEach(v => v.classList.toggle("active", v.id === "view-" + name));
   $$(".tab-btn").forEach(b => {
@@ -59,7 +61,7 @@ function route() {
     }
   });
   lokaValmynd($("#tabBar").contains(document.activeElement));   // val í valmynd lokar henni
-  onEnter[name]?.(sub);
+  onEnter[name]?.(sub, new URLSearchParams(fyrirspurn));
 }
 window.addEventListener("hashchange", route);
 
@@ -537,10 +539,40 @@ onEnter.ordabok = async () => {
 const reikna = {};
 const val = id => { const el = $("#" + id); return el.dataset.money !== undefined || el.type === "text" ? parseNum(el.value) : +el.value; };
 
+// Jafngreiðsla (annuitet): A = L·r / (1 − (1+r)^−n), r = mánaðarvextir.
+// Dæmi: 30 m.kr á 6% í 25 ár (300 mán.) → 193.290 kr á mánuði.
 function lanaGreidsla(L, rAr, n) {
   const r = rAr / 100 / 12;
   return r > 0 ? L * r / (1 - Math.pow(1 + r, -n)) : L / n;
 }
+
+// Hermir lán mánuð fyrir mánuð. Verðtryggt ef vb > 0 (ársverðbólga %).
+//  Raunstaða B er á föstu verðlagi; vísitölustuðull F_k = (1+im)^k breytir í krónur hvers tíma.
+//  Jafnar greiðslur:  raungreiðsla A = lanaGreidsla(L) fast → afborgun = A − B·r
+//  Jafnar afborganir: afborgun L/n fast (að raunvirði) + vextir B·r
+//  Aukainngreiðsla X kr (að nafnvirði) fer beint á höfuðstól: raunvirði X/F_k → lánið klárast fyrr.
+//  `auka` er tala eða fall af mánuði k (t.d. séreign í takmarkaðan tíma).
+// Dæmi: jafnar afborganir 30 m.kr á 6% í 25 ár → fyrsta greiðsla 100.000 + 150.000 = 250.000 kr.
+function hermaLan({ L, vextir, n, vb = 0, tegund = "jafngr", auka = 0 }) {
+  const r = vextir / 100 / 12, im = Math.pow(1 + vb / 100, 1 / 12) - 1;
+  const A = lanaGreidsla(L, vextir, n), afb = L / n, aukaK = typeof auka === "function" ? auka : () => auka;
+  let B = L, F = 1, greitt = 0, vextirSamt = 0, k = 0, fyrsta = 0;
+  const ferill = [L];                                   // eftirstöðvar í lok hvers árs (krónur hvers tíma)
+  while (B > 0.5 && k < n) {
+    k++; F *= 1 + im;
+    const vx = B * r;
+    let hofud = k === n ? B : (tegund === "jafnar" ? afb : A - vx);
+    if (k === 1) fyrsta = (vx + hofud) * F;
+    hofud = Math.min(B, hofud + aukaK(k) / F);
+    B -= hofud;
+    greitt += (vx + hofud) * F;
+    vextirSamt += vx * F;
+    if (k % 12 === 0 || B <= 0.5) ferill.push(Math.max(0, B) * F);
+  }
+  while (ferill.length < Math.ceil(n / 12) + 1) ferill.push(0);
+  return { greitt, vextir: vextirSamt, man: k, fyrsta, ferill, hamark: Math.max(...ferill) };
+}
+const arOgMan = m => { const a = Math.floor(m / 12), r = m % 12; return (a ? a + " ár" : "") + (a && r ? " og " : "") + (r ? r + " mán." : ""); };
 
 // Einföld línurit í SVG — `series` = [{ values, color, label, fill? }]
 // Á litlum skjá (≤ 400px) er hnitakerfið mjórra svo textinn minnki ekki of mikið
@@ -573,6 +605,11 @@ reikna.laun = () => {
   const greiddur = skattur - afsl, stett = G * st;
   const net = G - lif - sereign - greiddur - stett;
   const atv = G * SKATTUR.lifeyrirAtvinnurekandi + (ser ? G * 0.02 : 0);
+  // Útsvar sveitarfélags: staðgreiðsla er sú sama alls staðar (meðalútsvar); mismunur gerður upp við álagningu.
+  // Skattur_s = skattur + (útsvar_s − meðalútsvar) × stofn;  mismunur á ári = 12 × (greitt_s − greitt)
+  const sv = SKATTUR.utsvar[$("#l-sveit").value] || SKATTUR.utsvar.medaltal;
+  const greiddurS = Math.max(0, skattur + (sv.hlutfall - SKATTUR.medalutsvar) * stofn - (pa ? SKATTUR.personuafslattur : 0));
+  const leidretting = 12 * (greiddurS - greiddur);
   $("#l-out").innerHTML = `
     <div><div class="big">${kr(net)}</div><div class="big-sub">útborgað á mánuði · ${pct(G ? net / G * 100 : 0)} af heildarlaunum</div></div>
     ${rows([
@@ -583,46 +620,132 @@ reikna.laun = () => {
       ...(pa ? [["Persónuafsláttur", "+" + kr(afsl)]] : []),
       ...(st ? [["Stéttarfélag", "−" + kr(stett)]] : []),
       ["Útborgað", kr(net), "total"],
+      ...(Math.abs(leidretting) >= 1 ? [[`Við álagningu (${sv.nafn}, á ári)`, (leidretting < 0 ? "+" + kr(-leidretting) + " endurgreitt" : "−" + kr(leidretting) + " innheimt")]] : []),
     ])}
-    <p class="note">Vinnuveitandi greiðir auk þess ${kr(atv)} í lífeyrissjóð${ser ? " og séreign" : ""} á mánuði. Skatthlutfall er ${pct(G ? greiddur / G * 100 : 0)} af heildarlaunum. Útsvar er reiknað sem landsmeðaltal.</p>`;
+    <p class="note">Vinnuveitandi greiðir auk þess ${kr(atv)} í lífeyrissjóð${ser ? " og séreign" : ""} á mánuði. Skatthlutfall er ${pct(G ? greiddur / G * 100 : 0)} af heildarlaunum.
+      Staðgreiðsla miðast við meðalútsvar (${pct(SKATTUR.medalutsvar * 100)}) um allt land${sv === SKATTUR.utsvar.medaltal ? "" : `; útsvar í ${sv.nafn} er ${pct(sv.hlutfall * 100)} og mismunurinn er gerður upp við álagningu árið eftir`}.
+      Heimildir: <a href="${SKATTUR.heimild}" target="_blank" rel="noopener">Skatturinn</a>, <a href="${SKATTUR.utsvarHeimild}" target="_blank" rel="noopener">Samband íslenskra sveitarfélaga</a>.</p>`;
 };
 
 reikna.lan = () => {
   const P = val("p-verd"), E = val("p-eigid"), yrs = +$("#p-ar").value, n = yrs * 12;
   $("#p-ar-o").textContent = yrs + " ár";
-  const fyrstu = $("#p-fyrstu").checked;
+  const fyrstu = $("#p-fyrstu").checked, tegund = $("#p-teg").value, gjald = val("p-gjald"), auka = val("p-auka");
   const L = Math.max(0, P - E), hamark = fyrstu ? LANAREGLUR.vedhlutfallFyrstu : LANAREGLUR.vedhlutfall;
   const hlutfall = P ? L / P : 0;
-  const rO = val("p-ov"), rV = val("p-vt"), inf = val("p-vb") / 100;
+  const rO = val("p-ov"), rV = val("p-vt"), vb = val("p-vb");
   if (!L || !n) { $("#p-out").innerHTML = `<p class="note">Settu inn kaupverð og eigið fé.</p>`; return; }
 
-  const pO = lanaGreidsla(L, rO, n);
-  const aV = lanaGreidsla(L, rV, n);            // raungreiðsla verðtryggðs láns
-  const im = Math.pow(1 + inf, 1 / 12) - 1;     // mánaðarleg verðbólga
-  const rv = rV / 100 / 12, ro = rO / 100 / 12;
-  let balO = L, balV = L, totO = 0, totV = 0;
-  const serO = [L], serV = [L];
-  for (let k = 1; k <= n; k++) {
-    balO = balO * (1 + ro) - pO; totO += pO;
-    balV = balV * (1 + rv) - aV;                 // raunstaða
-    totV += aV * Math.pow(1 + im, k);
-    if (k % 12 === 0) { serO.push(Math.max(0, balO)); serV.push(Math.max(0, balV) * Math.pow(1 + im, k)); }
-  }
-  const peakV = Math.max(...serV);
-  const tekjur = pO / (fyrstu ? LANAREGLUR.greidslubyrdiFyrstu : LANAREGLUR.greidslubyrdi);
+  const lan = { L, n, tegund };
+  const O = hermaLan({ ...lan, vextir: rO }), V = hermaLan({ ...lan, vextir: rV, vb });
+  const OA = auka ? hermaLan({ ...lan, vextir: rO, auka }) : O, VA = auka ? hermaLan({ ...lan, vextir: rV, vb, auka }) : V;
+  const tekjur = O.fyrsta / (fyrstu ? LANAREGLUR.greidslubyrdiFyrstu : LANAREGLUR.greidslubyrdi);
+  const lysing = tegund === "jafnar" ? "fyrsta greiðsla, lækkar svo" : "á mánuði, fast allan tímann*";
+  const sparn = (an, med) => `sparar ${mkr(an.greitt - med.greitt)} · klárast ${arOgMan(an.man - med.man)} fyrr`;
 
   $("#p-out").innerHTML = `
     <div><div class="big">${mkr(L)}</div><div class="big-sub">lánsfjárhæð · veðsetning ${pct(hlutfall * 100)}</div></div>
     ${hlutfall > hamark + 1e-9 ? `<div class="warn">⚠️ Hámark veðsetningar er ${hamark * 100}%${fyrstu ? " fyrir fyrstu kaupendur" : ""}. Þú þarft minnst ${mkr(P * (1 - hamark))} í eigið fé.</div>` : ""}
     <div class="compare">
-      <div><h4>Óverðtryggt</h4><div class="v">${kr(pO)}</div><div class="s">á mánuði, fast allan tímann*<br>Samtals greitt: ${mkr(totO)}</div></div>
-      <div><h4>Verðtryggt</h4><div class="v">${kr(aV * (1 + im))}</div><div class="s">fyrsta greiðsla, hækkar með verðbólgu<br>Samtals greitt: ${mkr(totV)}</div></div>
+      <div><h4>Óverðtryggt</h4><div class="v">${kr(O.fyrsta)}</div><div class="s">${lysing}<br>Samtals greitt: ${mkr(OA.greitt + gjald)}</div></div>
+      <div><h4>Verðtryggt</h4><div class="v">${kr(V.fyrsta)}</div><div class="s">fyrsta greiðsla, ${tegund === "jafnar" ? "afborgun fylgir verðbólgu" : "hækkar með verðbólgu"}<br>Samtals greitt: ${mkr(VA.greitt + gjald)}</div></div>
+    </div>
+    ${auka ? rows([
+      [`Aukainngreiðsla ${kr(auka)}/mán. — óverðtryggt`, sparn(O, OA)],
+      ["— verðtryggt", sparn(V, VA)],
+    ]) : `<p class="note">Settu inn aukainngreiðslu til að sjá hvað hún sparar í krónum og árum.</p>`}
+    ${linurit([
+      { values: OA.ferill, color: "var(--teal)", label: "Eftirstöðvar óverðtryggt" },
+      { values: VA.ferill, color: "var(--gold)", label: "Eftirstöðvar verðtryggt (krónur hvers tíma)" },
+    ], yrs)}
+    <p class="note">${VA.hamark > L * 1.001 ? `Höfuðstóll verðtryggða lánsins fer hæst í ${mkr(VA.hamark)} áður en hann fer að lækka. ` : ""}Til að standast greiðslumat fyrir óverðtryggða lánið þarf ráðstöfunartekjur upp á a.m.k. ${kr(tekjur)} á mánuði.${gjald ? ` Samtals greitt inniheldur ${kr(gjald)} lántökugjald.` : ""} *Miðað við fasta vexti allan lánstímann; í raun breytast vextir. Upphæðir í krónum hvers tíma, ekki núvirði. Athugaðu vaxtatöflur og verðskrá bankanna.</p>`;
+};
+
+// Séreign inn á lán: mánaðarleg ráðstöfun = mín(4% launa, 333.000/12) + mín(2% launa, 167.000/12) á mann,
+// greidd sem aukainngreiðsla inn á höfuðstól í mest 10 ár (120 mánuði).
+// Dæmi: 650.000 kr laun → 26.000 + 13.000 = 39.000 kr/mán = 468.000 kr/ári (undir 500.000 kr hámarki).
+const sereignAMan = laun => {
+  const S = LANAREGLUR.sereign;
+  return Math.min(laun * S.launthegi, S.hamarkLaunthegi / 12) + Math.min(laun * S.atvinnurekandi, S.hamarkAtvinnurekandi / 12);
+};
+reikna.sereign = () => {
+  const L = val("e-eft"), vextir = val("e-vextir"), yrs = +$("#e-ar").value, n = yrs * 12;
+  const verdtr = $("#e-teg").value === "vt", vb = verdtr ? val("e-vb") : 0;
+  const nyt = Math.min(+$("#e-nyt").value, yrs), manNyt = nyt * 12;
+  $("#e-ar-o").textContent = yrs + " ár"; $("#e-nyt-o").textContent = nyt + " ár";
+  $("#e-vb").closest(".field").hidden = !verdtr;
+  const aMan = sereignAMan(val("e-laun")) + sereignAMan(val("e-maki"));
+  if (!L || !n) { $("#e-out").innerHTML = `<p class="note">Settu inn eftirstöðvar og lánstíma.</p>`; return; }
+  const an = hermaLan({ L, vextir, n, vb });
+  const med = hermaLan({ L, vextir, n, vb, auka: k => (k <= manNyt ? aMan : 0) });
+  const eftir = a => [an.ferill[a] ?? 0, med.ferill[a] ?? 0];
+  const [e0, e1] = eftir(nyt);
+  $("#e-out").innerHTML = `
+    <div><div class="big">${aMan ? arOgMan(an.man - med.man) : "—"}</div><div class="big-sub">${aMan ? "styttri lánstími með séreign inn á lánið" : "Settu inn laun til að reikna séreign"}</div></div>
+    ${rows([
+      ["Séreign inn á lán á mánuði", kr(aMan)],
+      ["— á ári", kr(aMan * 12)],
+      [`Samtals á ${nyt} árum`, mkr(aMan * manNyt)],
+      [`Eftirstöðvar eftir ${nyt} ár án séreignar`, mkr(e0)],
+      [`Eftirstöðvar eftir ${nyt} ár með séreign`, mkr(e1)],
+      ["Lánið greitt upp eftir", `${arOgMan(med.man)} (í stað ${arOgMan(an.man)})`],
+      ["Lægri vextir" + (verdtr ? " og verðbætur" : "") + " samtals", mkr(an.greitt - med.greitt), "total"],
+    ])}
+    ${linurit([
+      { values: an.ferill, color: "var(--muted)", label: "Án séreignar", dash: true },
+      { values: med.ferill, color: "var(--teal)", label: "Með séreign inn á lán" },
+    ], yrs)}
+    <p class="note">Ráðstöfunin er skattfrjáls: allt að 4% af launum frá þér (hám. ${kr(LANAREGLUR.sereign.hamarkLaunthegi)} á ári) og 2% frá launagreiðanda (hám. ${kr(LANAREGLUR.sereign.hamarkAtvinnurekandi)}), samtals 500.000 kr á ári á hvern einstakling í mest ${LANAREGLUR.sereign.arMest} ár. Hvort hjóna sækir um fyrir sig. Hámarkið hækkar með vísitölu frá 2027; hér er miðað við fasta krónutölu. Á móti kemur að séreignin safnar ekki ávöxtun til starfsloka.
+      Heimild: <a href="${LANAREGLUR.sereign.heimild}" target="_blank" rel="noopener">island.is</a>.</p>`;
+};
+
+// Leiga eða kaup — eignastaða eftir N ár, reiknað mánaðarlega:
+//  Kaup:  eign = V_t − lán_t + sjóður kaupanda.  V vex um g á ári; lán er óverðtryggt jafngreiðslulán.
+//         Mánaðarkostnaður kaupanda = afborgun + viðhald/gjöld (h% af V á ári).
+//  Leiga: leigjandi fjárfestir eigið fé + stimpilgjald í upphafi; leiga hækkar með verðbólgu.
+//  Sá sem greiðir minna í hverjum mánuði fjárfestir mismuninn á ávöxtun a.
+//  Í lokin dregst fjármagnstekjuskattur (22%) af ávöxtun sjóða; söluhagnaður af eigin íbúð er skattfrjáls.
+// Prófun: með g = a = vextir = viðhald = leiga = 0 leggur leigjandi afborganir kaupanda í sjóð,
+// svo leigjandinn endar nákvæmlega stimpilgjaldinu ofar.
+reikna.leiga = () => {
+  const P = val("k-verd"), E = Math.min(val("k-eigid"), P), vextir = val("k-vextir"), lanAr = +$("#k-lanar").value;
+  const R0 = val("k-leiga"), g = val("k-hus") / 100, a = val("k-avoxt") / 100, vb = val("k-vb") / 100, h = val("k-vidh") / 100;
+  const N = +$("#k-N").value, fyrstu = $("#k-fyrstu").checked;
+  $("#k-lanar-o").textContent = lanAr + " ár"; $("#k-N-o").textContent = N + " ár";
+  const S = LANAREGLUR.stimpilgjald, stimpil = P * (fyrstu ? S.fyrstuKaup : S.einstaklingur);
+  const L = P - E, n = lanAr * 12, A = L > 0 ? lanaGreidsla(L, vextir, n) : 0, r = vextir / 100 / 12;
+  const mg = Math.pow(1 + g, 1 / 12), ma = Math.pow(1 + a, 1 / 12), mvb = Math.pow(1 + vb, 1 / 12);
+  let V = P, B = L, R = R0, sjK = 0, sjL = E + stimpil, innK = 0, innL = E + stimpil;
+  const kaup = [E], leiga = [E + stimpil];                // eignastaða í upphafi (kaupandi hefur greitt stimpilgjald)
+  let kostK1 = 0;
+  for (let k = 1; k <= N * 12; k++) {
+    const greidsla = k <= n && B > 0 ? Math.min(A, B * (1 + r)) : 0;
+    B = Math.max(0, B * (1 + r) - greidsla);
+    const kostK = greidsla + V * h / 12;
+    if (k === 1) kostK1 = kostK;
+    sjK *= ma; sjL *= ma;
+    const mism = kostK - R;
+    if (mism > 0) { sjL += mism; innL += mism; } else { sjK -= mism; innK -= mism; }
+    V *= mg; R *= mvb;
+    if (k % 12 === 0) {
+      const skattur = (sj, inn) => Math.max(0, sj - inn) * SKATTUR.fjarmagnstekjuskattur;
+      kaup.push(V - B + sjK - skattur(sjK, innK));
+      leiga.push(sjL - skattur(sjL, innL));
+    }
+  }
+  const eK = kaup[N], eL = leiga[N], munur = eK - eL;
+  $("#k-out").innerHTML = `
+    <div><div class="big">${munur >= 0 ? "Kaup" : "Leiga"} +${mkr(Math.abs(munur))}</div><div class="big-sub">betri eignastaða eftir ${N} ár miðað við þessar forsendur</div></div>
+    <div class="compare">
+      <div><h4>Kaup</h4><div class="v">${mkr(eK)}</div><div class="s">íbúð ${mkr(V)} − lán ${mkr(B)}${sjK > 1 ? ` + sjóður ${mkr(sjK)}` : ""}<br>Fyrsti mánuður: ${kr(kostK1)}</div></div>
+      <div><h4>Leiga</h4><div class="v">${mkr(eL)}</div><div class="s">sjóður eftir skatt<br>Fyrsti mánuður: ${kr(R0)}</div></div>
     </div>
     ${linurit([
-      { values: serO, color: "var(--teal)", label: "Eftirstöðvar óverðtryggt" },
-      { values: serV, color: "var(--gold)", label: "Eftirstöðvar verðtryggt (krónur hvers tíma)" },
-    ], yrs)}
-    <p class="note">${peakV > L * 1.001 ? `Höfuðstóll verðtryggða lánsins fer hæst í ${mkr(peakV)} áður en hann fer að lækka. ` : ""}Til að standast greiðslumat fyrir óverðtryggða lánið þarf ráðstöfunartekjur upp á a.m.k. ${kr(tekjur)} á mánuði. *Miðað við fasta vexti allan lánstímann; í raun breytast vextir. Upphæðir í krónum hvers tíma, ekki núvirði. Athugaðu vaxtatöflur bankanna.</p>`;
+      { values: kaup, color: "var(--gold)", label: "Eignastaða við kaup" },
+      { values: leiga, color: "var(--teal)", label: "Eignastaða við leigu" },
+    ], N)}
+    <p class="note">Kaupandi greiðir stimpilgjald ${kr(stimpil)} (${pct((fyrstu ? S.fyrstuKaup : S.einstaklingur) * 100)}; reiknað af kaupverði — lögin miða við fasteignamat, sem er yfirleitt lægra). Leigjandi fjárfestir sömu upphæð og eigið féð. Sá sem greiðir minna á mánuði fjárfestir mismuninn. Óverðtryggt jafngreiðslulán á föstum vöxtum; sölukostnaður og vaxtabætur ekki teknar með. Krónur hvers tíma.
+      Heimild um stimpilgjald: <a href="${S.heimild}" target="_blank" rel="noopener">lög nr. 138/2013</a>.</p>`;
 };
 
 reikna.sparnadur = () => {
@@ -703,6 +826,7 @@ function initReiknivelar() {
   const { vnvAr } = SAGA_GOGN, sidastaAr = vnvAr.fra + vnvAr.gildi.length - 1;
   $("#v-ar").innerHTML = Array.from({ length: vnvAr.gildi.length }, (_, k) => sidastaAr - k).map(a => `<option value="${a}">${a}</option>`).join("");
   $("#v-ar").value = "2000";
+  $("#l-sveit").innerHTML = Object.entries(SKATTUR.utsvar).map(([k, u]) => `<option value="${k}">${u.nafn} (${pct(u.hlutfall * 100)})</option>`).join("");
   $("#g-swap").onclick = () => { const f = $("#g-fra").value; $("#g-fra").value = $("#g-til").value; $("#g-til").value = f; reikna.gengi(); };
 
   // Tölur með þúsundaskilum
@@ -713,20 +837,58 @@ function initReiknivelar() {
     inp.addEventListener("focus", () => inp.select());
   });
 
-  const map = { l: "laun", p: "lan", s: "sparnadur", f: "lifeyrir", g: "gengi", v: "verdlag" };
+  const map = { l: "laun", p: "lan", s: "sparnadur", f: "lifeyrir", g: "gengi", v: "verdlag", e: "sereign", k: "leiga" };
+  const uppfaeraSlod = debounce(skrifaSlod, 250);
   $("#view-reiknivelar").addEventListener("input", e => {
     const key = map[e.target.id?.split("-")[0]];
-    if (key) reikna[key]();
+    if (key) { reikna[key](); uppfaeraSlod(key); }
   });
   $("#calcNav").addEventListener("click", e => {
     const b = e.target.closest("[data-calc]");
-    if (b) history.replaceState(null, "", "#reiknivelar/" + b.dataset.calc), onEnter.reiknivelar(b.dataset.calc);
+    if (b) { onEnter.reiknivelar(b.dataset.calc); skrifaSlod(b.dataset.calc); }
+  });
+
+  // Deilanlegar slóðir: sjálfgefin gildi geymd, aðeins breytt inntak fer í slóðina
+  $$(".calc").forEach(c => {
+    $$("input[id], select[id]", c).forEach(el => { SJALFGEFID[el.id] = inntakGildi(el); });
+    $("div", c).insertAdjacentHTML("beforeend", `<button class="btn btn-ghost btn-sm deila" type="button" data-deila="${c.id.replace("calc-", "")}">🔗 Deila útreikningi</button>`);
+  });
+  $("#view-reiknivelar").addEventListener("click", e => {
+    const b = e.target.closest("[data-deila]");
+    if (!b) return;
+    skrifaSlod(b.dataset.deila);
+    const url = location.href;
+    (navigator.clipboard?.writeText(url) || Promise.reject()).then(() => toast("Tengill á útreikning afritaður 🔗"), () => prompt("Afritaðu tengilinn:", url));
   });
   Object.values(reikna).forEach(f => f());
-  LITILL_SKJAR.addEventListener("change", () => { reikna.lan(); reikna.sparnadur(); });   // teikna línurit upp á nýtt
+  LITILL_SKJAR.addEventListener("change", () => { reikna.lan(); reikna.sparnadur(); reikna.sereign(); reikna.leiga(); });   // teikna línurit upp á nýtt
 }
-onEnter.reiknivelar = sub => {
+// Inntak ↔ slóð: #reiknivelar/lan?verd=70000000&teg=jafnar  (lykill = id án forskeytis)
+const SJALFGEFID = {};
+const inntakGildi = el => el.type === "checkbox" ? (el.checked ? "1" : "0") : el.dataset.money !== undefined ? String(parseNum(el.value)) : el.value;
+function skrifaSlod(name) {
+  const q = new URLSearchParams();
+  $$(`#calc-${name} input[id], #calc-${name} select[id]`).forEach(el => {
+    const v = inntakGildi(el);
+    if (v !== SJALFGEFID[el.id]) q.set(el.id.replace(/^[a-z]+-/, ""), v);
+  });
+  const slod = "#reiknivelar/" + name + (q.size ? "?" + q : "");
+  if (location.hash !== slod) history.replaceState(null, "", slod);
+}
+function lesaSlod(name, q) {
+  if (!q || !q.size) return;
+  $$(`#calc-${name} input[id], #calc-${name} select[id]`).forEach(el => {
+    const v = q.get(el.id.replace(/^[a-z]+-/, ""));
+    if (v === null) return;
+    if (el.type === "checkbox") el.checked = v === "1";
+    else if (el.dataset.money !== undefined) el.value = nf0.format(parseNum(v));
+    else if (el.tagName === "SELECT") { if ([...el.options].some(o => o.value === v)) el.value = v; }
+    else el.value = v;
+  });
+}
+onEnter.reiknivelar = (sub, q) => {
   const name = reikna[sub] ? sub : ($(".calc.active")?.id.replace("calc-", "") || "laun");
+  lesaSlod(name, q);
   $$(".calc").forEach(c => c.classList.toggle("active", c.id === "calc-" + name));
   $$("#calcNav .chip").forEach(c => c.classList.toggle("active", c.dataset.calc === name));
   reikna[name]();

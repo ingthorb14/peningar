@@ -21,7 +21,7 @@
 <script>
   // Cache-busting: EINI staðurinn þar sem útgáfan er skráð. Hækkaðu við hverja breytingu.
   // Notuð fyrir css/js hér og fyrir data/ordabok.json í app.js.
-  var VERSJON = "20261006e";
+  var VERSJON = "20261006f";
   document.write('<link rel="stylesheet" href="css/style.css?v=' + VERSJON + '">');
 </script>
 <noscript><link rel="stylesheet" href="css/style.css"></noscript>
@@ -145,6 +145,8 @@
       <button class="chip" type="button" data-calc="laun">💼 Útborguð laun</button>
       <button class="chip" type="button" data-calc="lan">🏠 Íbúðalán</button>
       <button class="chip" type="button" data-calc="sparnadur">📈 Sparnaður</button>
+      <button class="chip" type="button" data-calc="sereign">🏦 Séreign inn á lán</button>
+      <button class="chip" type="button" data-calc="leiga">🔑 Leiga eða kaup</button>
       <button class="chip" type="button" data-calc="lifeyrir">👵 Lífeyrir</button>
       <button class="chip" type="button" data-calc="verdlag">🛒 Verðlag</button>
       <button class="chip" type="button" data-calc="gengi">💱 Gjaldmiðlar</button>
@@ -158,6 +160,7 @@
         <div class="field"><label for="l-laun">Heildarlaun á mánuði (kr)</label><input type="text" inputmode="numeric" id="l-laun" data-money value="650000"></div>
         <label class="check"><input type="checkbox" id="l-sereign" checked> Greiði 4% í séreignarsparnað</label>
         <label class="check"><input type="checkbox" id="l-pa" checked> Nýti fullan persónuafslátt</label>
+        <div class="field"><label for="l-sveit">Sveitarfélag (útsvar 2026)</label><select id="l-sveit"></select></div>
         <div class="field"><label for="l-stett">Stéttarfélagsgjald <output id="l-stett-o">1%</output></label><input type="range" id="l-stett" min="0" max="1.5" step="0.1" value="1"></div>
       </div>
       <div class="calc-out" id="l-out"></div>
@@ -175,8 +178,48 @@
         <div class="field"><label for="p-ov">Vextir óverðtryggt (%)</label><input type="number" id="p-ov" value="9.25" step="0.05"></div>
         <div class="field"><label for="p-vt">Vextir verðtryggt (%)</label><input type="number" id="p-vt" value="4.2" step="0.05"></div>
         <div class="field"><label for="p-vb">Áætluð meðalverðbólga (%)</label><input type="number" id="p-vb" value="4" step="0.25"></div>
+        <div class="field"><label for="p-teg">Greiðslufyrirkomulag</label><select id="p-teg"><option value="jafngr">Jafnar greiðslur (jafngreiðslulán)</option><option value="jafnar">Jafnar afborganir</option></select></div>
+        <div class="field"><label for="p-gjald">Lántökugjald (kr)</label><input type="text" inputmode="numeric" id="p-gjald" data-money value="0"></div>
+        <div class="field"><label for="p-auka">Aukainngreiðsla á mánuði (kr)</label><input type="text" inputmode="numeric" id="p-auka" data-money value="0"></div>
       </div>
       <div class="calc-out" id="p-out"></div>
+    </div>
+
+    <!-- Séreign inn á lán -->
+    <div class="card calc" id="calc-sereign">
+      <div>
+        <h3>Séreign inn á lán</h3>
+        <p class="desc">Skattfrjáls ráðstöfun séreignarsparnaðar inn á höfuðstól íbúðaláns. Hvað styttist lánið og hvað sparast?</p>
+        <div class="field"><label for="e-eft">Eftirstöðvar láns (kr)</label><input type="text" inputmode="numeric" id="e-eft" data-money value="45000000"></div>
+        <div class="field"><label for="e-teg">Tegund láns</label><select id="e-teg"><option value="ov">Óverðtryggt</option><option value="vt">Verðtryggt</option></select></div>
+        <div class="field"><label for="e-vextir">Vextir (%)</label><input type="number" id="e-vextir" value="9.25" step="0.05"></div>
+        <div class="field"><label for="e-vb">Áætluð meðalverðbólga (%)</label><input type="number" id="e-vb" value="4" step="0.25"></div>
+        <div class="field"><label for="e-ar">Eftirstandandi lánstími <output id="e-ar-o">35 ár</output></label><input type="range" id="e-ar" min="5" max="40" step="1" value="35"></div>
+        <div class="field"><label for="e-laun">Mánaðarlaun þín (kr)</label><input type="text" inputmode="numeric" id="e-laun" data-money value="650000"></div>
+        <div class="field"><label for="e-maki">Mánaðarlaun maka (kr, 0 ef enginn)</label><input type="text" inputmode="numeric" id="e-maki" data-money value="0"></div>
+        <div class="field"><label for="e-nyt">Séreign nýtt í <output id="e-nyt-o">10 ár</output></label><input type="range" id="e-nyt" min="1" max="10" step="1" value="10"></div>
+      </div>
+      <div class="calc-out" id="e-out"></div>
+    </div>
+
+    <!-- Leiga eða kaup -->
+    <div class="card calc" id="calc-leiga">
+      <div>
+        <h3>Leiga eða kaup</h3>
+        <p class="desc">Berðu saman eignastöðu eftir N ár: að kaupa íbúð með láni, eða leigja og fjárfesta eigið féð og mismuninn.</p>
+        <div class="field"><label for="k-verd">Kaupverð (kr)</label><input type="text" inputmode="numeric" id="k-verd" data-money value="65000000"></div>
+        <div class="field"><label for="k-eigid">Eigið fé (kr)</label><input type="text" inputmode="numeric" id="k-eigid" data-money value="13000000"></div>
+        <label class="check"><input type="checkbox" id="k-fyrstu"> Fyrstu kaup (hálft stimpilgjald)</label>
+        <div class="field"><label for="k-vextir">Vextir óverðtryggt (%)</label><input type="number" id="k-vextir" value="9.25" step="0.05"></div>
+        <div class="field"><label for="k-lanar">Lánstími <output id="k-lanar-o">40 ár</output></label><input type="range" id="k-lanar" min="5" max="40" step="5" value="40"></div>
+        <div class="field"><label for="k-leiga">Leiga á mánuði (kr)</label><input type="text" inputmode="numeric" id="k-leiga" data-money value="330000"></div>
+        <div class="field"><label for="k-hus">Hækkun fasteignaverðs á ári (%)</label><input type="number" id="k-hus" value="5" step="0.5"></div>
+        <div class="field"><label for="k-vb">Hækkun leigu / verðbólga á ári (%)</label><input type="number" id="k-vb" value="4" step="0.5"></div>
+        <div class="field"><label for="k-avoxt">Ávöxtun fjárfestingar á ári (%)</label><input type="number" id="k-avoxt" value="6" step="0.5"></div>
+        <div class="field"><label for="k-vidh">Viðhald, fasteignagjöld og trygging (% af verði á ári)</label><input type="number" id="k-vidh" value="1" step="0.1"></div>
+        <div class="field"><label for="k-N">Samanburður eftir <output id="k-N-o">10 ár</output></label><input type="range" id="k-N" min="1" max="30" step="1" value="10"></div>
+      </div>
+      <div class="calc-out" id="k-out"></div>
     </div>
 
     <!-- Sparnaður -->

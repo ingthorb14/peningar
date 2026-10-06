@@ -293,6 +293,8 @@ nav {
 .compare h4 { font-size:0.72rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--faint); margin-bottom:0.3rem; font-weight:500; }
 .compare .v { font-family:var(--serif); font-size:1.35rem; font-weight:700; }
 .compare .s { font-size:0.76rem; color:var(--muted); line-height:1.5; margin-top:0.2rem; }
+.deila { margin-top:0.6rem; }
+.field[hidden] { display:none; }
 .note { font-size:0.74rem; color:var(--faint); line-height:1.5; }
 .warn { font-size:0.8rem; color:var(--red); background:var(--red-light); border-radius:5px; padding:0.5rem 0.7rem; }
 .chart { width:100%; height:auto; display:block; }
