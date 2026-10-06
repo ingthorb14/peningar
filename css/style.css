@@ -105,6 +105,7 @@ nav {
 }
 .tab-btn:hover { color:var(--ink); }
 .tab-btn[aria-selected="true"] { color:var(--ink); border-bottom-color:var(--gold); }
+.menu-btn { display:none; }
 
 /* ── VIEWS ── */
 .view { display:none; }
@@ -371,6 +372,45 @@ footer a { color:var(--muted); }
   .search-kbd { display:none; }
   .quiz-question { padding:1.3rem 1.3rem 1rem; }
   .dict-table td, .dict-table th { padding:0.6rem 0.8rem; }
+
+  /* Hamborgaravalmynd: flipastikan verður fellivalmynd undir nav */
+  html { scroll-padding-top:70px; }
+  .menu-btn { display:inline-flex; font-size:0.82rem; font-weight:500; }
+  .tab-bar { display:none; }
+  .tab-bar.open {
+    display:flex; flex-direction:column; gap:0;
+    position:fixed; top:56px; left:0; right:0; max-height:calc(100vh - 56px); overflow-y:auto;
+    padding:0.4rem 1rem 0.8rem; background:var(--paper); box-shadow:var(--shadow);
+  }
+  .tab-bar.open .tab-btn { padding:0.85rem 0.6rem; font-size:0.95rem; border-bottom:1px solid var(--border); border-left:2.5px solid transparent; }
+  .tab-bar.open .tab-btn:last-child { border-bottom:none; }
+  .tab-bar.open .tab-btn[aria-selected="true"] { border-left-color:var(--gold); background:var(--gold-soft); }
+}
+/* Litlir símar (360–400px) */
+@media (max-width:400px) {
+  nav { gap:0.5rem; }
+  .logo { font-size:1.25rem; }
+  .nav-actions { gap:0.35rem; }
+  .icon-btn { padding:0.3rem 0.5rem; }
+  .page-hero { padding:1.8rem 1rem 1rem; }
+  .search-row .btn { padding:0.9rem 1rem; }
+  .result-body { padding:1rem; }
+  .result-header { padding:0.9rem 1rem; }
+  .result-empty { padding:1.2rem; }
+  .stat { padding:0.8rem 0.9rem; }
+  .stat .val { font-size:1.4rem; }
+  .ticker { gap:1.6rem; }
+  .calc.active { padding:1rem; gap:1.2rem; }
+  .calc-out { padding:1rem; }
+  .compare { grid-template-columns:1fr; }
+  .rows div { gap:0.6rem; font-size:0.83rem; }
+  .dict-table td, .dict-table th { padding:0.55rem 0.6rem; }
+  .dict-table td { font-size:0.85rem; }
+  .quiz-question { font-size:1.15rem; padding:1.1rem 1.1rem 0.9rem; }
+  .quiz-options, .quiz-actions { padding-left:0.9rem; padding-right:0.9rem; }
+  .quiz-feedback { padding:0 1.1rem 1rem; }
+  .quiz-final { padding:2rem 1rem; }
+  .tl-year { font-size:1.3rem; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration:0.001ms !important; transition-duration:0.001ms !important; }

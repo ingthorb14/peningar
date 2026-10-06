@@ -20,7 +20,7 @@
 <script>
   // Cache-busting: EINI staðurinn þar sem útgáfan er skráð. Hækkaðu við hverja breytingu.
   // Notuð fyrir css/js hér og fyrir data/ordabok.json í app.js.
-  var VERSJON = "20261006a";
+  var VERSJON = "20261006b";
   document.write('<link rel="stylesheet" href="css/style.css?v=' + VERSJON + '">');
 </script>
 <noscript><link rel="stylesheet" href="css/style.css"></noscript>
@@ -48,10 +48,11 @@
   <div class="nav-actions">
     <button class="icon-btn" id="searchBtn" type="button" title="Leita (ýttu á /)">🔍 <span class="kbd search-kbd">/</span></button>
     <button class="icon-btn" id="themeBtn" type="button" aria-label="Skipta um þema">🌙</button>
+    <button class="icon-btn menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="tabBar"><span aria-hidden="true">☰</span><span class="sr-only">Valmynd: </span><span id="menuLabel"></span></button>
   </div>
 </nav>
 
-<div class="tab-bar" role="tablist" aria-label="Hlutar síðunnar">
+<div class="tab-bar" id="tabBar" role="tablist" aria-label="Hlutar síðunnar">
   <a class="tab-btn" role="tab" href="#hugtok" data-tab="hugtok">🔍 Hugtök</a>
   <a class="tab-btn" role="tab" href="#ordabok" data-tab="ordabok">📖 Orðabók</a>
   <a class="tab-btn" role="tab" href="#reiknivelar" data-tab="reiknivelar">🧮 Reiknivélar</a>

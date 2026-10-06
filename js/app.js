@@ -61,8 +61,12 @@ function route() {
     const on = b.dataset.tab === name;
     b.setAttribute("aria-selected", on);
     b.tabIndex = on ? 0 : -1;
-    if (on) b.scrollIntoView({ block: "nearest", inline: "nearest" });
+    if (on) {
+      if (!valmyndOpin()) b.scrollIntoView({ block: "nearest", inline: "nearest" });
+      $("#menuLabel").textContent = b.textContent.replace(/^\S+\s/, "");   // án emoji
+    }
   });
+  lokaValmynd($("#tabBar").contains(document.activeElement));   // val í valmynd lokar henni
   onEnter[name]?.(sub);
 }
 window.addEventListener("hashchange", route);
@@ -392,8 +396,10 @@ function lanaGreidsla(L, rAr, n) {
 }
 
 // Einföld línurit í SVG — `series` = [{ values, color, label, fill? }]
+// Á litlum skjá (≤ 400px) er hnitakerfið mjórra svo textinn minnki ekki of mikið
+const LITILL_SKJAR = matchMedia("(max-width:400px)");
 function linurit(series, years, { unit = mkr } = {}) {
-  const W = 420, H = 190, P = { l: 52, r: 8, t: 10, b: 22 };
+  const W = LITILL_SKJAR.matches ? 300 : 420, H = LITILL_SKJAR.matches ? 210 : 190, P = { l: 52, r: 8, t: 10, b: 22 };
   const max = Math.max(...series.flatMap(s => s.values)) * 1.05 || 1;
   const x = i => P.l + (i / (series[0].values.length - 1)) * (W - P.l - P.r);
   const y = v => P.t + (1 - v / max) * (H - P.t - P.b);
@@ -544,6 +550,7 @@ function initReiknivelar() {
     if (b) history.replaceState(null, "", "#reiknivelar/" + b.dataset.calc), onEnter.reiknivelar(b.dataset.calc);
   });
   Object.values(reikna).forEach(f => f());
+  LITILL_SKJAR.addEventListener("change", () => { reikna.lan(); reikna.sparnadur(); });   // teikna línurit upp á nýtt
 }
 onEnter.reiknivelar = sub => {
   const name = reikna[sub] ? sub : ($(".calc.active")?.id.replace("calc-", "") || "laun");
@@ -715,6 +722,52 @@ function initThema() {
   };
 }
 
+// ── VALMYND (farsími, < 720px) ───────────────────────────────────
+// Flipastikan (#tabBar) birtist sem fellivalmynd. Fókus helst inni meðan hún er opin.
+const valmyndOpin = () => $("#tabBar").classList.contains("open");
+function opnaValmynd() {
+  $("#tabBar").classList.add("open");
+  $("#menuBtn").setAttribute("aria-expanded", "true");
+  ($(".tab-btn[aria-selected='true']") || $(".tab-btn")).focus();
+}
+function lokaValmynd(skilaFokus = true) {
+  if (!valmyndOpin()) return;
+  $("#tabBar").classList.remove("open");
+  $("#menuBtn").setAttribute("aria-expanded", "false");
+  if (skilaFokus) $("#menuBtn").focus();
+}
+function initValmynd() {
+  $("#menuBtn").onclick = () => valmyndOpin() ? lokaValmynd() : opnaValmynd();
+  // Smellur utan við valmynd og takka lokar
+  document.addEventListener("click", e => {
+    if (valmyndOpin() && !e.target.closest("#tabBar, #menuBtn")) lokaValmynd(false);
+  });
+  document.addEventListener("keydown", e => {
+    if (!valmyndOpin()) return;
+    if (e.key === "Escape") { e.preventDefault(); lokaValmynd(); return; }
+    if (e.key !== "Tab") return;
+    // Fókusgildra: takki + allir flipar, hringast
+    const items = [$("#menuBtn"), ...$$(".tab-btn")];
+    const i = items.indexOf(document.activeElement);
+    e.preventDefault();
+    items[(i + (e.shiftKey ? -1 : 1) + items.length) % items.length].focus();
+  });
+  // Ef glugginn er breikkaður yfir 720px lokast valmyndin
+  matchMedia("(max-width:720px)").addEventListener("change", e => { if (!e.matches) lokaValmynd(false); });
+}
+// Örvatakkar færa fókus milli flipa (bæði í stiku og valmynd)
+function initFlipaLyklar() {
+  $("#tabBar").addEventListener("keydown", e => {
+    const tabs = $$(".tab-btn"), i = tabs.indexOf(document.activeElement);
+    if (i < 0) return;
+    const fram = ["ArrowRight", "ArrowDown"], aftur = ["ArrowLeft", "ArrowUp"];
+    let j = fram.includes(e.key) ? i + 1 : aftur.includes(e.key) ? i - 1 : e.key === "Home" ? 0 : e.key === "End" ? tabs.length - 1 : null;
+    if (j === null) return;
+    e.preventDefault();
+    tabs[(j + tabs.length) % tabs.length].focus();
+  });
+}
+
 function fokusLeit() {
   if ($("#view-ordabok").classList.contains("active")) return $("#dictInput").focus();
   if (!$("#view-hugtok").classList.contains("active")) location.hash = "hugtok";
@@ -733,6 +786,8 @@ document.addEventListener("keydown", e => {
 $("#uppfaert").textContent = UPPFAERT;
 $("#searchBtn").onclick = fokusLeit;
 initThema();
+initValmynd();
+initFlipaLyklar();
 initHugtok();
 initOrdabok();
 initReiknivelar();
