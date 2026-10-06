@@ -450,7 +450,10 @@ function initGraf() {
     e.preventDefault();
     syndGrafGildi(Math.max(0, Math.min(n - 1, j)));
   });
-  new ResizeObserver(debounce(teiknaGraf, 60)).observe(svg.parentElement);
+  // Teikna aftur í nýrri breidd. ResizeObserver nær flestu; resize er varaleið (t.d. snúningur á síma)
+  const endurteikna = debounce(teiknaGraf, 60);
+  new ResizeObserver(endurteikna).observe(svg.parentElement);
+  window.addEventListener("resize", endurteikna);
   veljaTimabil(10);
 }
 

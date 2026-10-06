@@ -53,5 +53,5 @@ jobs:
           else
             gh pr create --base main --head "$GREIN" \
               --title "Uppfærð VNV frá Hagstofu" \
-              --body "$(printf '%s\n\n%s\n\n%s' "$YFIRLIT" "Sjálfvirk uppfærsla á \`js/saga-gogn.js\` (verðbólgugraf og verðbólgureiknir)." "Heimild: Hagstofa Íslands, tafla VIS01000 og VIS01005. Athugaðu líka hvort uppfæra þurfi MARKADUR í js/gogn.js og hækka VERSJON í index.html.")"
+              --body "$(printf '%s\n\n%s\n\n%s' "$YFIRLIT" "Sjálfvirk uppfærsla á \`js/saga-gogn.js\` (verðbólgugraf og verðbólgureiknir)." "Heimild: Hagstofa Íslands, tafla VIS01000 og VIS01005. MARKADUR í js/gogn.js les sjálfkrafa úr SAGA_GOGN. Hækkaðu VERSJON í index.html áður en þú sameinar.")"
           fi

@@ -1,6 +1,7 @@
 // ═══════════════════════════════════════════════════════════════════
 //  GÖGN — allt efni síðunnar á einum stað.
-//  Uppfærðu MARKADUR þegar nýjar tölur koma frá Seðlabanka/Hagstofu.
+//  Stýrivextir, verðbólga og VNV koma sjálfkrafa úr SAGA_GOGN (js/saga-gogn.js,
+//  hlaðið á undan þessari skrá). Uppfærðu SAGA_GOGN með scripts/saekja-gogn.mjs.
 // ═══════════════════════════════════════════════════════════════════
 
 const UPPFAERT = "24. september 2026";
@@ -8,11 +9,16 @@ const UPPFAERT = "24. september 2026";
 // Netfang fyrir „Stingdu upp á hugtaki“. Tómt = tengillinn er falinn.
 const NETFANG = "";
 
-// Hagtölur sem ekki eru sóttar sjálfkrafa. Gengi er sótt lifandi (sjá app.js).
+// Nýjustu gildi úr SAGA_GOGN: „2026-09“ → „september 2026“, „2026-08-19“ → „19. ágúst 2026“
+const MANADARHEITI = ["janúar", "febrúar", "mars", "apríl", "maí", "júní", "júlí", "ágúst", "september", "október", "nóvember", "desember"];
+const manudurTexti = iso => { const [y, m, d] = iso.split("-").map(Number); return (d ? d + ". " : "") + MANADARHEITI[m - 1] + " " + y; };
+const [SV_DAGS, SV_GILDI] = SAGA_GOGN.styrivextir[SAGA_GOGN.styrivextir.length - 1];
+
+// Hagtölur. Gengi er sótt lifandi (sjá app.js).
 const MARKADUR = {
-  styrivextir:  { gildi: 8.0,   dags: "19. ágúst 2026", heimild: "https://sedlabanki.is/" },
-  verdbolga:    { gildi: 5.6,   dags: "ágúst 2026",     heimild: "https://hagstofa.is/talnaefni/efnahagur/verdlag/" },
-  vnv:          { gildi: 694.6, dags: "ágúst 2026",     heimild: "https://hagstofa.is/talnaefni/efnahagur/verdlag/visitala-neysluverds/" },
+  styrivextir:  { gildi: SV_GILDI, dags: manudurTexti(SV_DAGS), heimild: "https://sedlabanki.is/" },
+  verdbolga:    { gildi: SAGA_GOGN.verdbolga.gildi[SAGA_GOGN.verdbolga.gildi.length - 1], dags: manudurTexti(SAGA_GOGN.vnvNyjast.man), heimild: "https://hagstofa.is/talnaefni/efnahagur/verdlag/" },
+  vnv:          { gildi: SAGA_GOGN.vnvNyjast.gildi, dags: manudurTexti(SAGA_GOGN.vnvNyjast.man), heimild: "https://hagstofa.is/talnaefni/efnahagur/verdlag/visitala-neysluverds/" },
   verdbolgumarkmid: 2.5,
   // Varagildi ef ekki næst í gengisþjónustu
   gengiVara: { EUR: 138.0, USD: 120.9, GBP: 160.6, DKK: 18.46, NOK: 12.78, SEK: 12.24, dags: "23. sept. 2026" },

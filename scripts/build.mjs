@@ -22,6 +22,7 @@ const SITE = (process.env.SITE_URL ||
 
 // ── Gögn úr js/gogn.js (keyrt í einangruðu samhengi) ──────────────
 const ctx = vm.createContext({});
+vm.runInContext(lesa("js/saga-gogn.js"), ctx);   // gogn.js les MARKADUR úr SAGA_GOGN
 const { HUGTOK, FLOKKAR, UPPFAERT, slug } = vm.runInContext(lesa("js/gogn.js") + "\n;({ HUGTOK, FLOKKAR, UPPFAERT, slug })", ctx);
 
 // Cache-busting útgáfa og footer eru sótt úr index.html svo þau séu á einum stað
