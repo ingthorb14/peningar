@@ -1117,6 +1117,12 @@ document.addEventListener("keydown", e => {
   if (e.key === "/" && !e.target.matches("input,textarea,select")) { e.preventDefault(); fokusLeit(); }
 });
 
+// Fréttabréf neðst á hverjum flipa (birtist aðeins ef FRETTABREF_ACTION er stillt í gogn.js)
+function initFrettabref() {
+  if (!FRETTABREF_ACTION) return;
+  $$(".view").forEach(v => v.insertAdjacentHTML("beforeend", `<div class="fb-wrap">${frettabrefHtml(v.id.replace("view-", ""))}</div>`));
+}
+
 // ── RÆSING ───────────────────────────────────────────────────────
 $("#uppfaert").textContent = UPPFAERT;
 $("#searchBtn").onclick = fokusLeit;
@@ -1128,6 +1134,7 @@ initOrdabok();
 initReiknivelar();
 initProf();
 initEfni();
+initFrettabref();
 teiknaTicker();
 route();
 saekjaGengi();

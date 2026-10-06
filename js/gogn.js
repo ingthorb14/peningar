@@ -9,6 +9,30 @@ const UPPFAERT = "24. september 2026";
 // Netfang fyrir „Stingdu upp á hugtaki“. Tómt = tengillinn er falinn.
 const NETFANG = "";
 
+// Fréttabréfið „Peningar vikunnar“ — action-slóð úr embed-formi Buttondown eða MailerLite.
+//   Buttondown: https://buttondown.com/api/emails/embed-subscribe/<notandanafn>
+//   MailerLite: https://assets.mailerlite.com/jsonp/<reikningur>/forms/<form-id>/subscribe
+// Tómt = formið er falið. Formið sendir beint til þjónustunnar (nýr flipi); síðan geymir ekkert og setur engar vafrakökur.
+const FRETTABREF_ACTION = "";
+
+function frettabrefHtml(id) {
+  if (!FRETTABREF_ACTION) return "";
+  const ml = /mailerlite/.test(FRETTABREF_ACTION), veita = ml ? "MailerLite" : "Buttondown";
+  return `<form class="card frettabref" action="${FRETTABREF_ACTION}" method="post" target="_blank">
+    <div class="fb-texti">
+      <h2 class="fb-titill">Peningar vikunnar</h2>
+      <p>Eitt hugtak, ein tala, eitt ráð á viku. Ókeypis, og þú getur afskráð þig hvenær sem er.</p>
+    </div>
+    <div class="fb-reitir">
+      <label class="sr-only" for="fb-${id}">Netfang</label>
+      <input class="text-input" type="email" name="${ml ? "fields[email]" : "email"}" id="fb-${id}" placeholder="Netfangið þitt" autocomplete="email" required>
+      ${ml ? `<input type="hidden" name="ml-submit" value="1"><input type="hidden" name="anticsrf" value="true">` : ""}
+      <button class="btn" type="submit">Skrá mig</button>
+    </div>
+    <label class="check fb-samthykki"><input type="checkbox" required> Ég samþykki að netfangið mitt sé sent til ${veita} og notað eingöngu til að senda mér fréttabréfið.</label>
+  </form>`;
+}
+
 // Nýjustu gildi úr SAGA_GOGN: „2026-09“ → „september 2026“, „2026-08-19“ → „19. ágúst 2026“
 const MANADARHEITI = ["janúar", "febrúar", "mars", "apríl", "maí", "júní", "júlí", "ágúst", "september", "október", "nóvember", "desember"];
 const manudurTexti = iso => { const [y, m, d] = iso.split("-").map(Number); return (d ? d + ". " : "") + MANADARHEITI[m - 1] + " " + y; };

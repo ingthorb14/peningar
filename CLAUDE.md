@@ -15,6 +15,9 @@ Svaraðu á íslensku, stutt og hnitmiðað. Kóðaathugasemdir á íslensku (ei
 - Gengi sótt lifandi frá `api.frankfurter.dev`, varagildi í `MARKADUR.gengiVara`.
 - Leturgerðir: Fraunces (serif, fyrirsagnir) + DM Sans. Litir: paper / gull (`--gold`) / teal (`--teal`).
 - `scripts/build.mjs` — Node build (engin dependency), keyrt af Vercel (`vercel.json`). Afritar síðuna í `dist/` (gitignored) og býr til `dist/hugtok/<slug>/index.html` fyrir hvert hugtak (title, description, canonical, og:, JSON-LD), `sitemap.xml` og `robots.txt`. Lén: `SITE_URL` eða `VERCEL_PROJECT_PRODUCTION_URL`. `norm()`/`slug()` eru í gogn.js og deilt með build.
+- `content/blogg/*.md` — bloggfærslur (frontmatter: `titill`, `dags` YYYY-MM-DD, `lysing`). build.mjs býr til `/blogg/`, `/blogg/<skráarnafn>/` og `/blogg/rss.xml` (lítill markdown-þýðandi í build.mjs: ##, listar, >, töflur, **feitt**, [tenglar]).
+- Fréttabréf: `FRETTABREF_ACTION` í gogn.js (Buttondown/MailerLite embed-slóð). Tómt = formið falið. `frettabrefHtml()` er notað bæði í app.js (neðst á hverjum flipa) og build.mjs (hugtaka- og bloggsíður).
+- Vercel Hobby er eingöngu fyrir persónulega notkun án fjárhagslegs ávinnings — auglýsingar/affiliate krefjast Pro-áskriftar (sjá vercel.com/docs/limits/fair-use-guidelines).
 - `og-image.png` (1200×630) — búin til með `scripts/og-image.html` (opna í vafra → Sækja PNG).
 - Vercel Web Analytics: script neðst í `<head>` (ekki keyrt á localhost).
 - Cache-busting: breytan `VERSJON` (`YYYYMMDDx`) efst í `<head>` í index.html — eini staðurinn; hækka við hverja breytingu.
