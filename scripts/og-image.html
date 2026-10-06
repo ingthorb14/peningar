@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="is">
+<head>
+<meta charset="UTF-8">
+<title>og-image generator</title>
+<!-- Býr til og-image.png (1200×630) í útliti síðunnar.
+     Opnaðu í vafra (t.d. python3 -m http.server → /scripts/og-image.html),
+     smelltu á „Sækja PNG“ og vistaðu sem og-image.png í rót verkefnisins. -->
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;1,9..144,400&family=DM+Sans:wght@300;500&display=swap" rel="stylesheet">
+<style>
+  body { margin:0; padding:20px; background:#ddd; font-family:system-ui; }
+  canvas { width:600px; height:315px; display:block; box-shadow:0 2px 12px rgba(0,0,0,.2); }
+  a { display:inline-block; margin-top:12px; }
+</style>
+</head>
+<body>
+<canvas id="c" width="1200" height="630"></canvas>
+<a id="dl" download="og-image.png" href="#">Sækja PNG</a>
+<script>
+// Litir úr css/style.css (ljóst þema)
+const C = { paper: "#f5f0e8", ink: "#0f0e0c", muted: "#6b665c", faint: "#9a948a", border: "#e0dbd0", gold: "#c8922a", goldSoft: "rgba(200,146,42,0.1)" };
+
+async function teikna() {
+  await Promise.all([
+    document.fonts.load('700 132px "Fraunces"'),
+    document.fonts.load('italic 400 132px "Fraunces"'),
+    document.fonts.load('300 30px "DM Sans"'),
+    document.fonts.load('500 16px "DM Sans"'),
+  ]);
+  const c = document.getElementById("c"), x = c.getContext("2d");
+  x.fillStyle = C.paper; x.fillRect(0, 0, 1200, 630);
+
+  // Mynt til hægri
+  x.save();
+  x.translate(985, 270);
+  x.fillStyle = C.goldSoft; x.beginPath(); x.arc(0, 0, 150, 0, Math.PI * 2); x.fill();
+  x.strokeStyle = C.gold; x.lineWidth = 6; x.beginPath(); x.arc(0, 0, 150, 0, Math.PI * 2); x.stroke();
+  x.lineWidth = 2; x.beginPath(); x.arc(0, 0, 124, 0, Math.PI * 2); x.stroke();
+  x.fillStyle = C.gold; x.font = 'italic 400 120px "Fraunces"'; x.textAlign = "center"; x.textBaseline = "middle";
+  x.fillText("kr", 0, 8);
+  x.restore();
+
+  // Merki
+  x.textBaseline = "alphabetic"; x.textAlign = "left";
+  x.font = '700 46px "Fraunces"'; x.fillStyle = C.ink;
+  x.fillText("peningar", 80, 112);
+  const w1 = x.measureText("peningar").width;
+  x.fillStyle = C.gold; x.fillText(".", 80 + w1, 112);
+  const w2 = x.measureText(".").width;
+  x.fillStyle = C.ink; x.fillText("is", 80 + w1 + w2, 112);
+  x.font = '500 16px "DM Sans"'; x.fillStyle = C.faint; x.letterSpacing = "3px";
+  x.fillText("FJÁRMÁL Á ÍSLENSKU", 82, 142);
+  x.letterSpacing = "0px";
+
+  // Fyrirsögn
+  x.font = '700 128px "Fraunces"'; x.fillStyle = C.ink; x.letterSpacing = "-3px";
+  x.fillText("Fjármál", 76, 330);
+  x.font = 'italic 400 128px "Fraunces"'; x.fillStyle = C.gold;
+  x.fillText("á þínu máli", 76, 452);
+  x.letterSpacing = "0px";
+
+  // Undirtexti
+  x.font = '300 30px "DM Sans"'; x.fillStyle = C.muted;
+  x.fillText("Hugtök · Orðabók · Reiknivélar · Nýjustu vextir og verðbólga", 80, 535);
+
+  // Gullrönd neðst
+  x.fillStyle = C.gold; x.fillRect(0, 618, 1200, 12);
+
+  document.getElementById("dl").href = c.toDataURL("image/png");
+  document.body.dataset.tilbuid = "1";
+}
+teikna();
+</script>
+</body>
+</html>

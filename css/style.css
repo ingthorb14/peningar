@@ -84,7 +84,7 @@ nav {
 .icon-btn {
   background:none; border:1.5px solid var(--border); border-radius:6px;
   padding:0.3rem 0.6rem; cursor:pointer; font-size:0.85rem; color:var(--ink);
-  transition:all 0.2s; display:inline-flex; align-items:center; gap:0.35rem; line-height:1.4;
+  transition:all 0.2s; display:inline-flex; align-items:center; gap:0.35rem; line-height:1.4; text-decoration:none;
 }
 .icon-btn:hover { border-color:var(--gold); background:var(--gold-soft); }
 .kbd { font-size:0.7rem; border:1px solid var(--border); border-radius:3px; padding:0 0.3rem; color:var(--muted); }
@@ -197,7 +197,7 @@ nav {
 .result-body { padding:1.4rem 1.6rem; display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
 .result-explain { grid-column:1/-1; font-size:1rem; font-weight:300; line-height:1.75; color:var(--ink-2); }
 .result-box { background:var(--paper); border:1px solid var(--border); border-radius:6px; padding:1rem 1.2rem; }
-.result-box h3 { font-size:0.68rem; font-weight:500; letter-spacing:0.1em; text-transform:uppercase; color:var(--faint); margin-bottom:0.45rem; }
+.result-box h3, .result-box .h3 { font-size:0.68rem; font-weight:500; letter-spacing:0.1em; text-transform:uppercase; color:var(--faint); margin-bottom:0.45rem; }
 .result-box p { font-size:0.9rem; font-weight:300; line-height:1.65; color:var(--ink-2); }
 .result-box .big-num { font-family:var(--serif); font-size:1.8rem; font-weight:700; color:var(--gold); display:block; margin-bottom:0.15rem; line-height:1.2; }
 .result-box.tip { grid-column:1/-1; background:var(--amber-light); border-color:var(--amber-border); }
@@ -352,6 +352,11 @@ nav {
 .ftag-trygging { background:var(--red-light); color:var(--red); }
 .ftag-annad { background:var(--cream); color:var(--muted); }
 
+/* ── STATIC HUGTAKASÍÐUR (/hugtok/<slug>) ── */
+.crumbs { max-width:900px; margin:0 auto; padding:2rem 2rem 1rem; font-size:0.8rem; color:var(--faint); }
+.crumbs a { color:var(--muted); }
+.more { max-width:900px; margin:0 auto; padding:0 2rem 3rem; }
+
 /* ── TOAST ── */
 .toast { position:fixed; bottom:1.5rem; left:50%; transform:translateX(-50%) translateY(20px); background:var(--ink); color:var(--paper); padding:0.6rem 1.1rem; border-radius:6px; font-size:0.85rem; opacity:0; pointer-events:none; transition:all 0.25s; z-index:300; }
 .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
@@ -364,7 +369,7 @@ footer a { color:var(--muted); }
 @media (max-width:720px) {
   nav, .tab-bar { padding-left:1rem; padding-right:1rem; }
   .page-hero { padding:2.2rem 1rem 1.2rem; }
-  .search-wrap, #result, .wrap, .quiz-wrap { padding-left:1rem; padding-right:1rem; }
+  .search-wrap, #result, .wrap, .quiz-wrap, .crumbs, .more { padding-left:1rem; padding-right:1rem; }
   .result-body { grid-template-columns:1fr; padding:1.2rem; }
   .result-header { padding:1rem 1.2rem; flex-direction:column; }
   .calc.active { grid-template-columns:1fr; padding:1.2rem; }

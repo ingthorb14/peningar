@@ -12,11 +12,14 @@ Svaraðu á íslensku, stutt og hnitmiðað. Kóðaathugasemdir á íslensku (ei
 - `api/explain.js` — Vercel serverless fall fyrir AI-skýringar (Claude Haiku). Óvirkt nema `ANTHROPIC_API_KEY` sé stillt.
 - Gengi sótt lifandi frá `api.frankfurter.dev`, varagildi í `MARKADUR.gengiVara`.
 - Leturgerðir: Fraunces (serif, fyrirsagnir) + DM Sans. Litir: paper / gull (`--gold`) / teal (`--teal`).
+- `scripts/build.mjs` — Node build (engin dependency), keyrt af Vercel (`vercel.json`). Afritar síðuna í `dist/` (gitignored) og býr til `dist/hugtok/<slug>/index.html` fyrir hvert hugtak (title, description, canonical, og:, JSON-LD), `sitemap.xml` og `robots.txt`. Lén: `SITE_URL` eða `VERCEL_PROJECT_PRODUCTION_URL`. `norm()`/`slug()` eru í gogn.js og deilt með build.
+- `og-image.png` (1200×630) — búin til með `scripts/og-image.html` (opna í vafra → Sækja PNG).
+- Vercel Web Analytics: script neðst í `<head>` (ekki keyrt á localhost).
 - Cache-busting: breytan `VERSJON` (`YYYYMMDDx`) efst í `<head>` í index.html — eini staðurinn; hækka við hverja breytingu.
 
 ## Vinnuflæði
 VS Code → GitHub Desktop (commit + push) → GitHub `ingthorb14/peningar` → Vercel sjálfvirk birting (peningar.vercel.app).
-Eigandinn commitar og pushar sjálfur. Þú breytir skrám og prófar staðbundið (`npx serve .` eða `python3 -m http.server`).
+Eigandinn commitar og pushar sjálfur. Þú breytir skrám og prófar staðbundið: `node scripts/build.mjs && python3 -m http.server -d dist` (hugtakasíðurnar eru aðeins til eftir build).
 
 ## Reglur
 1. Breyttu núverandi skrám. Aldrei endurskrifa frá grunni.

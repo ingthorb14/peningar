@@ -12,7 +12,8 @@
 <meta property="og:site_name" content="peningar.is">
 <meta property="og:title" content="Peningar — Fjármál á íslensku">
 <meta property="og:description" content="Hugtök, orðabók, reiknivélar og nýjustu vextir og verðbólga — allt á íslensku.">
-<meta name="twitter:card" content="summary">
+<meta name="twitter:card" content="summary_large_image">
+<!-- scripts/build.mjs bætir við canonical, og:url og og:image (algildar slóðir) -->
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,7 +21,7 @@
 <script>
   // Cache-busting: EINI staðurinn þar sem útgáfan er skráð. Hækkaðu við hverja breytingu.
   // Notuð fyrir css/js hér og fyrir data/ordabok.json í app.js.
-  var VERSJON = "20261006b";
+  var VERSJON = "20261006c";
   document.write('<link rel="stylesheet" href="css/style.css?v=' + VERSJON + '">');
 </script>
 <noscript><link rel="stylesheet" href="css/style.css"></noscript>
@@ -35,6 +36,13 @@
 </script>
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"WebSite","name":"peningar.is","inLanguage":"is","description":"Fjármál á íslensku — hugtök, orðabók og reiknivélar."}
+</script>
+<script>
+  // Vercel Web Analytics — engar vafrakökur. Ekki keyrt á localhost (þar er ekkert /_vercel).
+  window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+  if (!/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) {
+    var va = document.createElement("script"); va.defer = true; va.src = "/_vercel/insights/script.js"; document.head.appendChild(va);
+  }
 </script>
 </head>
 <body>

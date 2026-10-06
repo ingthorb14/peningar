@@ -59,6 +59,19 @@ function tala(n, aukastafir = 0, lagm = 0) {
 }
 const pct = n => tala(n, 2, 1) + "%";
 
+// Fjarlægir broddstafi án þess að breyta lengd strengsins (svo auðkenning passi)
+function norm(s) {
+  let out = "";
+  for (const ch of String(s).toLowerCase()) {
+    if (ch === "ð") { out += "d"; continue; }
+    const base = ch.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    out += base.length === 1 ? base : ch;
+  }
+  return out;
+}
+// Slóð hugtaks: „Vísitala neysluverðs“ → „visitala-neysluverds“ (notað í /hugtok/<slug>)
+const slug = s => norm(s).replace(/þ/g, "th").replace(/æ/g, "ae").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+
 // ── HUGTÖK ─────────────────────────────────────────────────────────
 // Bættu við nýjum hugtökum hér. `aliases` = önnur leitarorð (t.d. enska).
 const HUGTOK = [

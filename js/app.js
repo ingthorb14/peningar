@@ -9,17 +9,9 @@ const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
-// Fjarlægir broddstafi án þess að breyta lengd strengsins (svo auðkenning passi)
-function norm(s) {
-  let out = "";
-  for (const ch of String(s).toLowerCase()) {
-    if (ch === "ð") { out += "d"; continue; }
-    const base = ch.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-    out += base.length === 1 ? base : ch;
-  }
-  return out;
-}
-const slug = s => norm(s).replace(/þ/g, "th").replace(/æ/g, "ae").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+// norm() og slug() eru í gogn.js (build-skriftan notar þau líka)
+// Hvert hugtak á eigin static síðu (búin til af scripts/build.mjs). Gamlar #hugtok/<slug> slóðir virka enn.
+const hugtakSlod = term => "/hugtok/" + slug(term);
 
 const nf0 = { format: n => tala(n, 0) };
 const nf2 = { format: n => tala(n, 2) };
@@ -164,7 +156,7 @@ function teiknaHugtak(h, fromAI = false) {
       <div class="result-box"><h3>🇮🇸 Íslenskt dæmi</h3><p>${esc(h.example)}</p></div>
       ${h.keyNumber ? `<div class="result-box" style="text-align:center"><h3>Tala til að þekkja</h3><span class="big-num">${esc(h.keyNumber)}</span><p>${esc(h.keyNumberLabel)}</p></div>` : ""}
       <div class="result-box tip"><h3>💡 Gott að vita</h3><p>${esc(h.tip)}</p></div>
-      ${rel.length ? `<div class="result-foot"><span class="lbl">Tengd hugtök:</span>${rel.map(r => `<a class="chip" href="#hugtok/${slug(r.term)}">${esc(r.term)}</a>`).join("")}</div>` : ""}
+      ${rel.length ? `<div class="result-foot"><span class="lbl">Tengd hugtök:</span>${rel.map(r => `<a class="chip" href="${hugtakSlod(r.term)}">${esc(r.term)}</a>`).join("")}</div>` : ""}
       ${fromAI ? `<p class="ai-note">Þessi skýring var búin til af gervigreind og getur innihaldið villur. Sannreyndu mikilvægar upplýsingar.</p>` : ""}
     </div>
   </article>`;
@@ -273,7 +265,7 @@ function initHugtok() {
   $("#searchForm").addEventListener("submit", e => { e.preventDefault(); syna(inp.value); });
 
   $("#quickPicks").innerHTML = ["Verðbólga", "Stýrivextir", "Verðtrygging", "Séreignarsparnaður", "ETF", "Persónuafsláttur", "Greiðslubyrðarhlutfall", "Raunvextir"]
-    .map(t => `<a class="chip" href="#hugtok/${slug(t)}">${t}</a>`).join("");
+    .map(t => `<a class="chip" href="${hugtakSlod(t)}">${t}</a>`).join("");
 
   // Yfirlitstölur fyrir ofan hugtakaspjöldin
   const wrap = $("#view-hugtok .wrap");
@@ -284,7 +276,7 @@ function initHugtok() {
   $("#catFilter").innerHTML = cats.map(c => `<button class="chip${c === "all" ? " active" : ""}" type="button" data-cat="${c}">${c === "all" ? "Allt" : FLOKKAR[c].nafn}</button>`).join("");
   const teiknaSpjold = cat => {
     $("#cardGrid").innerHTML = HUGTOK.filter(h => cat === "all" || h.cat === cat)
-      .map(h => `<a class="glossary-card" href="#hugtok/${slug(h.term)}" style="text-decoration:none"><span class="ct">${esc(h.term)}</span><span class="ch">${esc(h.hint)}</span></a>`).join("");
+      .map(h => `<a class="glossary-card" href="${hugtakSlod(h.term)}" style="text-decoration:none"><span class="ct">${esc(h.term)}</span><span class="ch">${esc(h.hint)}</span></a>`).join("");
   };
   $("#catFilter").addEventListener("click", e => {
     const b = e.target.closest("[data-cat]");
@@ -297,7 +289,7 @@ function initHugtok() {
   $("#result").addEventListener("click", e => {
     const s = e.target.closest("[data-share]");
     if (s) {
-      const url = location.origin + location.pathname + "#hugtok/" + s.dataset.share;
+      const url = location.origin + "/hugtok/" + s.dataset.share;
       (navigator.clipboard?.writeText(url) || Promise.reject()).then(() => toast("Tengill afritaður 🔗"), () => prompt("Afritaðu tengilinn:", url));
     }
     const d = e.target.closest("[data-dictq]");
