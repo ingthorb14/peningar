@@ -17,7 +17,13 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;1,9..144,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=20260924b">
+<script>
+  // Cache-busting: EINI staðurinn þar sem útgáfan er skráð. Hækkaðu við hverja breytingu.
+  // Notuð fyrir css/js hér og fyrir data/ordabok.json í app.js.
+  var VERSJON = "20261006a";
+  document.write('<link rel="stylesheet" href="css/style.css?v=' + VERSJON + '">');
+</script>
+<noscript><link rel="stylesheet" href="css/style.css"></noscript>
 <script>
   // Stillir þema áður en síðan teiknast, svo hún blikki ekki
   (function () {
@@ -263,7 +269,8 @@
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<script src="js/gogn.js?v=20260924b"></script>
-<script src="js/app.js?v=20260924b"></script>
+<script>
+  document.write('<script src="js/gogn.js?v=' + VERSJON + '"><\/script><script src="js/app.js?v=' + VERSJON + '"><\/script>');
+</script>
 </body>
 </html>

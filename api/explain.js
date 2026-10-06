@@ -23,6 +23,8 @@ Ef spurningin er ekki um fjármál, hagfræði eða viðskipti skaltu skila {"er
 Ekki gefa persónulega fjárfestingarráðgjöf.`;
 
 export default async function handler(req, res) {
+  // GET = ókeypis athugun á hvort fallið sé virkt (svarar alltaf 200 svo engin villa birtist í console)
+  if (req.method === "GET") return res.status(200).json({ virkt: Boolean(process.env.ANTHROPIC_API_KEY) });
   if (req.method !== "POST") return res.status(405).json({ error: "method_not_allowed" });
   if (!process.env.ANTHROPIC_API_KEY) return res.status(503).json({ error: "not_configured" });
 

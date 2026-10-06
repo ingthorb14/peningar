@@ -5,6 +5,9 @@
 
 const UPPFAERT = "24. september 2026";
 
+// Netfang fyrir „Stingdu upp á hugtaki“. Tómt = tengillinn er falinn.
+const NETFANG = "";
+
 // Hagtölur sem ekki eru sóttar sjálfkrafa. Gengi er sótt lifandi (sjá app.js).
 const MARKADUR = {
   styrivextir:  { gildi: 8.0,   dags: "19. ágúst 2026", heimild: "https://sedlabanki.is/" },

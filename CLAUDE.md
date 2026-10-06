@@ -12,7 +12,7 @@ Svaraðu á íslensku, stutt og hnitmiðað. Kóðaathugasemdir á íslensku (ei
 - `api/explain.js` — Vercel serverless fall fyrir AI-skýringar (Claude Haiku). Óvirkt nema `ANTHROPIC_API_KEY` sé stillt.
 - Gengi sótt lifandi frá `api.frankfurter.dev`, varagildi í `MARKADUR.gengiVara`.
 - Leturgerðir: Fraunces (serif, fyrirsagnir) + DM Sans. Litir: paper / gull (`--gold`) / teal (`--teal`).
-- Cache-busting: `?v=YYYYMMDDx` á css/js/json í index.html og app.js — uppfæra við hverja breytingu.
+- Cache-busting: breytan `VERSJON` (`YYYYMMDDx`) efst í `<head>` í index.html — eini staðurinn; hækka við hverja breytingu.
 
 ## Vinnuflæði
 VS Code → GitHub Desktop (commit + push) → GitHub `ingthorb14/peningar` → Vercel sjálfvirk birting (peningar.vercel.app).

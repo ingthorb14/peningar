@@ -175,9 +175,32 @@ async function ekkiFannst(q) {
     <p>Þetta hugtak er ekki enn í safninu okkar.${hits.length ? " En það kemur fyrir í orðabókinni:" : ""}</p>
     ${hits.length ? `<div class="dict-hits">${hits.map(e => `<div><span>${esc(e.en)}</span><span>${esc(e.is)}</span></div>`).join("")}</div>
       <p><a href="#ordabok" data-dictq="${esc(q)}">Sjá allt í orðabókinni →</a></p>` : ""}
-    <button class="btn btn-sm" type="button" id="askAI">✨ Biðja gervigreind um skýringu</button>
+    <div class="chips" id="noResultActions"></div>
   </div>`;
-  $("#askAI").onclick = () => spyrjaGervigreind(q);
+  const el = $("#noResultActions");
+  const ai = await aiTiltaek();
+  if (!el.isConnected) return;   // ný leit hefur þegar teiknað yfir
+  if (ai) {
+    el.innerHTML = `<button class="btn btn-sm" type="button" id="askAI">✨ Biðja gervigreind um skýringu</button>`;
+    $("#askAI").onclick = () => spyrjaGervigreind(q);
+  } else {
+    const efni = encodeURIComponent("Tillaga að hugtaki: " + q);
+    el.innerHTML = (hits.length ? "" : `<a class="chip" href="#ordabok">📖 Skoða orðabókina</a>`) +
+      (NETFANG ? `<a class="chip" href="mailto:${NETFANG}?subject=${efni}">✉️ Stingdu upp á hugtaki</a>` : "");
+  }
+}
+
+// Er AI-skýring virk? GET á /api/explain svarar { virkt } án kostnaðar. Athugað einu sinni.
+// Á localhost með einföldum vefþjóni (npx serve / python) er ekkert /api — sleppum þá
+// beiðninni svo 404 birtist ekki í console. `vercel dev` keyrir á porti 3000.
+let aiPromise = null;
+function aiTiltaek() {
+  const stadbundid = /^(localhost|127\.0\.0\.1)$/.test(location.hostname) && location.port !== "3000";
+  aiPromise ??= stadbundid ? Promise.resolve(false) : fetch("/api/explain")
+    .then(r => r.ok ? r.json() : {})
+    .then(d => d.virkt === true)
+    .catch(() => false);
+  return aiPromise;
 }
 
 async function spyrjaGervigreind(q) {
@@ -287,7 +310,7 @@ onEnter.hugtok = sub => {
 let DICT = null, dictPromise = null, dictFilter = "all", dictLimit = 100;
 function hladaOrdabok() {
   if (DICT) return Promise.resolve(DICT);
-  dictPromise ??= fetch("data/ordabok.json?v=20260924b").then(r => r.json()).then(rows => {
+  dictPromise ??= fetch("data/ordabok.json?v=" + VERSJON).then(r => r.json()).then(rows => {
     DICT = rows.map(([en, is]) => ({ en, is, ne: norm(en), ni: norm(is) }));
     return DICT;
   });
