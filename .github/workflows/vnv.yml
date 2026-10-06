@@ -1,0 +1,57 @@
+# Sækir nýjustu vísitölu neysluverðs frá Hagstofu einu sinni í viku.
+# Ef tölurnar hafa breyst er js/saga-gogn.js uppfærð á greininni „gogn/vnv“
+# og opnuð pull request inn á main. Aldrei commitað beint á main.
+name: Uppfæra VNV
+
+on:
+  schedule:
+    - cron: "0 9 * * 1"   # mánudaga kl. 09:00 UTC (Hagstofa birtir VNV í lok mánaðar)
+  workflow_dispatch:       # hægt að keyra handvirkt undir Actions
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: vnv
+  cancel-in-progress: false
+
+jobs:
+  vnv:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Sækja VNV frá Hagstofu
+        id: saekja
+        run: |
+          node scripts/saekja-gogn.mjs --vnv | tee yfirlit.txt
+          echo "yfirlit=$(cat yfirlit.txt)" >> "$GITHUB_OUTPUT"
+
+      - name: Opna eða uppfæra PR ef gögn breyttust
+        env:
+          GH_TOKEN: ${{ github.token }}
+          YFIRLIT: ${{ steps.saekja.outputs.yfirlit }}
+        run: |
+          if git diff --quiet -- js/saga-gogn.js; then
+            echo "Engin breyting á VNV — engin PR."
+            exit 0
+          fi
+          GREIN="gogn/vnv"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$GREIN"
+          git add js/saga-gogn.js
+          git commit -m "Uppfærð VNV frá Hagstofu" -m "$YFIRLIT"
+          git push --force origin "$GREIN"
+          if [ -n "$(gh pr list --head "$GREIN" --state open --json number --jq '.[0].number')" ]; then
+            echo "PR er þegar opin — greinin var uppfærð."
+          else
+            gh pr create --base main --head "$GREIN" \
+              --title "Uppfærð VNV frá Hagstofu" \
+              --body "$(printf '%s\n\n%s\n\n%s' "$YFIRLIT" "Sjálfvirk uppfærsla á \`js/saga-gogn.js\` (verðbólgugraf og verðbólgureiknir)." "Heimild: Hagstofa Íslands, tafla VIS01000 og VIS01005. Athugaðu líka hvort uppfæra þurfi MARKADUR í js/gogn.js og hækka VERSJON í index.html.")"
+          fi

@@ -21,7 +21,7 @@
 <script>
   // Cache-busting: EINI staðurinn þar sem útgáfan er skráð. Hækkaðu við hverja breytingu.
   // Notuð fyrir css/js hér og fyrir data/ordabok.json í app.js.
-  var VERSJON = "20261006c";
+  var VERSJON = "20261006d";
   document.write('<link rel="stylesheet" href="css/style.css?v=' + VERSJON + '">');
 </script>
 <noscript><link rel="stylesheet" href="css/style.css"></noscript>
@@ -146,6 +146,7 @@
       <button class="chip" type="button" data-calc="lan">🏠 Íbúðalán</button>
       <button class="chip" type="button" data-calc="sparnadur">📈 Sparnaður</button>
       <button class="chip" type="button" data-calc="lifeyrir">👵 Lífeyrir</button>
+      <button class="chip" type="button" data-calc="verdlag">🛒 Verðlag</button>
       <button class="chip" type="button" data-calc="gengi">💱 Gjaldmiðlar</button>
     </div>
 
@@ -203,6 +204,17 @@
         <label class="check"><input type="checkbox" id="f-sereign" checked> Með séreignarsparnaði (4% + 2%)</label>
       </div>
       <div class="calc-out" id="f-out"></div>
+    </div>
+
+    <!-- Verðlag -->
+    <div class="card calc" id="calc-verdlag">
+      <div>
+        <h3>Verðbólgureiknir</h3>
+        <p class="desc">Hvað jafngildir upphæð frá fyrri árum miklu í dag? Reiknað með vísitölu neysluverðs frá Hagstofu Íslands.</p>
+        <div class="field"><label for="v-upph">Upphæð (kr)</label><input type="text" inputmode="numeric" id="v-upph" data-money value="100000"></div>
+        <div class="field"><label for="v-ar">Árið</label><select id="v-ar"></select></div>
+      </div>
+      <div class="calc-out" id="v-out"></div>
     </div>
 
     <!-- Gengi -->
@@ -279,7 +291,7 @@
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
-  document.write('<script src="js/gogn.js?v=' + VERSJON + '"><\/script><script src="js/app.js?v=' + VERSJON + '"><\/script>');
+  document.write('<script src="js/gogn.js?v=' + VERSJON + '"><\/script><script src="js/saga-gogn.js?v=' + VERSJON + '"><\/script><script src="js/app.js?v=' + VERSJON + '"><\/script>');
 </script>
 </body>
 </html>

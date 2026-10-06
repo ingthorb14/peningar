@@ -234,6 +234,34 @@ nav {
 .stat .val { font-family:var(--serif); font-size:1.7rem; font-weight:700; margin:0.2rem 0 0.1rem; }
 .stat .sub { font-size:0.72rem; color:var(--muted); }
 
+/* ── GRAF: stýrivextir og verðbólga ── */
+.graf { padding:1.2rem 1.3rem 1rem; margin-bottom:2rem; display:flex; flex-direction:column; gap:0.7rem; }
+.graf-head { display:flex; justify-content:space-between; align-items:center; gap:0.6rem; flex-wrap:wrap; }
+.graf-titill { font-family:var(--serif); font-size:1.15rem; font-weight:700; }
+.graf-bil { margin:0; }
+.graf-svaedi { position:relative; }
+.graf-svg { display:block; max-width:100%; height:auto; touch-action:pan-y; cursor:crosshair; border-radius:4px; }
+.graf-svg text { font-family:var(--sans); font-size:11px; fill:var(--faint); }
+.graf-svg .g-grid { stroke:var(--border); }
+.graf-svg .g-tick { stroke:var(--faint); }
+.graf-svg .g-mark { stroke:var(--gold); stroke-width:1.5; stroke-dasharray:5 4; }
+.graf-svg .g-vb, .graf-svg .g-sv { fill:none; stroke-width:2; stroke-linejoin:round; }
+.graf-svg .g-vb { stroke:var(--red); }
+.graf-svg .g-sv { stroke:var(--teal); }
+.graf-svg .g-cursor { stroke:var(--muted); stroke-width:1; stroke-dasharray:3 3; }
+.graf-svg .g-dot-vb { fill:var(--red); stroke:var(--card-bg); stroke-width:2; }
+.graf-svg .g-dot-sv { fill:var(--teal); stroke:var(--card-bg); stroke-width:2; }
+.graf-tip {
+  position:absolute; top:6px; pointer-events:none; z-index:2;
+  background:var(--card-bg); border:1px solid var(--border); border-radius:6px; box-shadow:var(--shadow);
+  padding:0.5rem 0.7rem; font-size:0.78rem; line-height:1.55; display:flex; flex-direction:column; white-space:nowrap;
+}
+.graf-tip[hidden] { display:none; }
+.graf-tip b { font-weight:500; color:var(--ink); }
+.graf-tip i { display:inline-block; width:8px; height:8px; border-radius:2px; margin-right:0.4rem; }
+.graf-tip .tip-sub { color:var(--muted); font-size:0.72rem; }
+.legend i.dash { background:none; border-top:2px dashed var(--gold); height:0; width:14px; vertical-align:3px; border-radius:0; }
+
 /* ── CALCULATORS ── */
 .calc-nav { display:flex; flex-wrap:wrap; gap:0.4rem; margin-bottom:1.2rem; }
 .calc { display:none; }
@@ -404,6 +432,7 @@ footer a { color:var(--muted); }
   .result-empty { padding:1.2rem; }
   .stat { padding:0.8rem 0.9rem; }
   .stat .val { font-size:1.4rem; }
+  .graf { padding:1rem 0.8rem 0.9rem; }
   .ticker { gap:1.6rem; }
   .calc.active { padding:1rem; gap:1.2rem; }
   .calc-out { padding:1rem; }

@@ -269,8 +269,9 @@ function initHugtok() {
 
   // Yfirlitstölur fyrir ofan hugtakaspjöldin
   const wrap = $("#view-hugtok .wrap");
-  wrap.insertAdjacentHTML("afterbegin", `<h2 class="section-label">Staðan í dag</h2><div class="stats" id="stats"></div>`);
+  wrap.insertAdjacentHTML("afterbegin", `<h2 class="section-label">Staðan í dag</h2><div class="stats" id="stats"></div>${grafHtml()}`);
   teiknaStats();
+  initGraf();
 
   const cats = ["all", ...Object.keys(FLOKKAR)];
   $("#catFilter").innerHTML = cats.map(c => `<button class="chip${c === "all" ? " active" : ""}" type="button" data-cat="${c}">${c === "all" ? "Allt" : FLOKKAR[c].nafn}</button>`).join("");
@@ -297,10 +298,161 @@ function initHugtok() {
   });
 }
 onEnter.hugtok = sub => {
+  teiknaGraf();   // flipinn var falinn þegar grafið var búið til (breidd 0)
   if (!sub) return;
   const h = HUGTOK.find(x => slug(x.term) === sub);
   if (h) { $("#searchInput").value = h.term; teiknaHugtak(h); requestAnimationFrame(() => $("#result").scrollIntoView({ behavior: "smooth", block: "start" })); }
 };
+
+// ── GRAF: STÝRIVEXTIR & VERÐBÓLGA (gögn úr js/saga-gogn.js) ─────
+// Tími er táknaður sem ár með broti: mars 2008 → 2008 + 2/12
+const tAr = (y, m, d = 1) => y + (m - 1) / 12 + (d - 1) / 365;
+const VB_SAGA = (() => {
+  const [y0, m0] = SAGA_GOGN.verdbolga.fra.split("-").map(Number);
+  return SAGA_GOGN.verdbolga.gildi.map((v, k) => {
+    const y = y0 + Math.floor((m0 - 1 + k) / 12), m = (m0 - 1 + k) % 12 + 1;
+    return { y, m, t: tAr(y, m), v };
+  });
+})();
+const SV_SAGA = SAGA_GOGN.styrivextir.map(([d, v]) => { const [y, m, dd] = d.split("-").map(Number); return { t: tAr(y, m, dd), v }; });
+// Meginvextir í gildi á tíma t (þrepafall)
+const styrivextirA = t => { let v = SV_SAGA[0].v; for (const s of SV_SAGA) { if (s.t <= t) v = s.v; else break; } return v; };
+const GRAF_ENDIR = VB_SAGA[VB_SAGA.length - 1].t + 1 / 12;   // lok síðasta mælda mánaðar
+const graf = { ar: 10, idx: null };
+
+function grafHtml() {
+  return `<div class="card graf" id="graf">
+    <div class="graf-head">
+      <h3 class="graf-titill">Stýrivextir og verðbólga</h3>
+      <div class="chips graf-bil" role="group" aria-label="Tímabil">
+        ${[[5, "5 ár"], [10, "10 ár"], [0, "Allt"]].map(([a, t]) => `<button class="chip" type="button" data-ar="${a}">${t}</button>`).join("")}
+      </div>
+    </div>
+    <div class="graf-svaedi">
+      <svg class="graf-svg" tabindex="0" role="img"></svg>
+      <div class="graf-tip" aria-live="polite" hidden></div>
+    </div>
+    <div class="legend">
+      <span><i style="background:var(--red)"></i>Ársverðbólga</span>
+      <span><i style="background:var(--teal)"></i>Stýrivextir (meginvextir SÍ)</span>
+      <span><i class="dash"></i>Verðbólgumarkmið ${pct(MARKADUR.verdbolgumarkmid)}</span>
+    </div>
+    <p class="note">Heimildir: <a href="https://px.hagstofa.is/pxis/pxweb/is/Efnahagur/Efnahagur__visitolur__1_vnv__1_vnv/VIS01000.px" target="_blank" rel="noopener">Hagstofa Íslands</a> (vísitala neysluverðs) og
+      <a href="https://sedlabanki.is/gagnatorg/vextir/" target="_blank" rel="noopener">Seðlabanki Íslands</a> (meginvextir). Gögn til ${MANUDIR[VB_SAGA.at(-1).m - 1]} ${VB_SAGA.at(-1).y}. Músin, fingur eða örvatakkar sýna gildi hvers mánaðar.</p>
+  </div>`;
+}
+
+// Snyrtileg skref á y-ás (1, 2, 2,5, 5 …) svo línur verði 4–6
+function grafSkref(max) {
+  const groft = max / 5, p = Math.pow(10, Math.floor(Math.log10(groft)));
+  return [1, 2, 2.5, 5, 10].map(k => k * p).find(k => k >= groft);
+}
+
+function teiknaGraf() {
+  const svg = $("#graf .graf-svg");
+  const W = Math.round(svg.parentElement.clientWidth);
+  if (!W) return;                                    // flipinn er falinn
+  const H = Math.round(Math.min(320, Math.max(220, W * 0.42)));
+  const P = { l: 34, r: 10, t: 12, b: 24 };
+  const t0 = graf.ar ? GRAF_ENDIR - graf.ar : VB_SAGA[0].t;
+  const vb = VB_SAGA.filter(d => d.t >= t0 - 1e-9);
+  const sv = [{ t: t0, v: styrivextirA(t0) }, ...SV_SAGA.filter(s => s.t > t0 && s.t < GRAF_ENDIR)];
+  const max = Math.max(MARKADUR.verdbolgumarkmid, ...vb.map(d => d.v), ...sv.map(s => s.v));
+  const min = Math.min(0, ...vb.map(d => d.v));
+  const skref = grafSkref(max - min), yMax = Math.ceil(max / skref) * skref, yMin = Math.floor(min / skref) * skref;
+  const x = t => P.l + (t - t0) / (GRAF_ENDIR - t0) * (W - P.l - P.r);
+  const y = v => P.t + (1 - (v - yMin) / (yMax - yMin)) * (H - P.t - P.b);
+  const f = n => n.toFixed(1);
+
+  let grid = "";
+  for (let v = yMin; v <= yMax + 1e-9; v += skref) {
+    grid += `<line class="g-grid" x1="${P.l}" x2="${W - P.r}" y1="${f(y(v))}" y2="${f(y(v))}"/><text x="${P.l - 6}" y="${f(y(v) + 3.5)}" text-anchor="end">${tala(v, 1)}%</text>`;
+  }
+  // Ártöl á x-ás: bil fer eftir breidd og tímabili
+  const arBil = [1, 2, 4, 5].find(k => (W - P.l - P.r) / ((GRAF_ENDIR - t0) / k) >= 46);
+  for (let a = Math.ceil(t0); a < GRAF_ENDIR; a++) {
+    if (a % arBil) continue;
+    grid += `<line class="g-tick" x1="${f(x(a))}" x2="${f(x(a))}" y1="${H - P.b}" y2="${H - P.b + 4}"/><text x="${f(x(a))}" y="${H - 6}" text-anchor="middle">${a}</text>`;
+  }
+  const markmid = `<line class="g-mark" x1="${P.l}" x2="${W - P.r}" y1="${f(y(MARKADUR.verdbolgumarkmid))}" y2="${f(y(MARKADUR.verdbolgumarkmid))}"/>`;
+  const vbLina = vb.map((d, i) => `${i ? "L" : "M"}${f(x(d.t))},${f(y(d.v))}`).join("");
+  // Stýrivextir sem þrepalína: lárétt þar til næsta ákvörðun tekur gildi
+  let svLina = `M${f(x(sv[0].t))},${f(y(sv[0].v))}`;
+  for (const s of sv.slice(1)) svLina += `H${f(x(s.t))}V${f(y(s.v))}`;
+  svLina += `H${f(x(GRAF_ENDIR))}`;
+
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  svg.setAttribute("width", W); svg.setAttribute("height", H);
+  const sidast = vb.at(-1);
+  svg.setAttribute("aria-label", `Línurit: ársverðbólga og stýrivextir frá ${vb[0].y}. Nýjast (${MANUDIR[sidast.m - 1]} ${sidast.y}): verðbólga ${pct(sidast.v)}, stýrivextir ${pct(styrivextirA(sidast.t + 1 / 12 - 1e-6))}.`);
+  svg.innerHTML = `${grid}${markmid}
+    <path class="g-sv" d="${svLina}"/><path class="g-vb" d="${vbLina}"/>
+    <g class="g-hover" visibility="hidden"><line class="g-cursor" y1="${P.t}" y2="${H - P.b}"/><circle class="g-dot-vb" r="4"/><circle class="g-dot-sv" r="4"/></g>`;
+  Object.assign(graf, { vb, x, y, W });
+  if (graf.idx != null) syndGrafGildi(Math.min(graf.idx, vb.length - 1));
+}
+
+function syndGrafGildi(i) {
+  const { vb, x, y, W } = graf, d = vb[i];
+  if (!d) return;
+  graf.idx = i;
+  const sv = styrivextirA(d.t + 1 / 12 - 1e-6);       // í gildi í lok mánaðar
+  const g = $("#graf .g-hover"), X = x(d.t);
+  g.setAttribute("visibility", "visible");
+  $("line", g).setAttribute("x1", X); $("line", g).setAttribute("x2", X);
+  $(".g-dot-vb", g).setAttribute("cx", X); $(".g-dot-vb", g).setAttribute("cy", y(d.v));
+  $(".g-dot-sv", g).setAttribute("cx", X); $(".g-dot-sv", g).setAttribute("cy", y(sv));
+  const tip = $("#graf .graf-tip");
+  tip.innerHTML = `<b>${MANUDIR[d.m - 1]} ${d.y}</b>
+    <span><i style="background:var(--red)"></i>Verðbólga ${pct(d.v)}</span>
+    <span><i style="background:var(--teal)"></i>Stýrivextir ${pct(sv)}</span>
+    <span class="tip-sub">Raunstýrivextir ${pct(sv - d.v)}</span>`;
+  tip.hidden = false;
+  // Tooltip vinstra megin við línuna ef hún er hægra megin á grafinu
+  const haegri = X > W * 0.55;
+  tip.style.left = haegri ? "" : `${X + 12}px`;
+  tip.style.right = haegri ? `${W - X + 12}px` : "";
+}
+function feljaGrafGildi() {
+  graf.idx = null;
+  $("#graf .g-hover")?.setAttribute("visibility", "hidden");
+  $("#graf .graf-tip").hidden = true;
+}
+
+function initGraf() {
+  const svg = $("#graf .graf-svg");
+  const veljaTimabil = ar => {
+    graf.ar = ar;
+    $$("#graf .graf-bil .chip").forEach(b => { const on = +b.dataset.ar === ar; b.classList.toggle("active", on); b.setAttribute("aria-pressed", on); });
+    feljaGrafGildi();
+    teiknaGraf();
+  };
+  $("#graf .graf-bil").addEventListener("click", e => { const b = e.target.closest("[data-ar]"); if (b) veljaTimabil(+b.dataset.ar); });
+  // Mús og snerting: næsti mánuður við bendilinn
+  const benda = e => {
+    if (!graf.vb) return;
+    const r = svg.getBoundingClientRect(), X = (e.clientX - r.left) * graf.W / r.width;
+    let best = 0, bd = Infinity;
+    graf.vb.forEach((d, i) => { const dd = Math.abs(graf.x(d.t) - X); if (dd < bd) { bd = dd; best = i; } });
+    syndGrafGildi(best);
+  };
+  svg.addEventListener("pointermove", benda);
+  svg.addEventListener("pointerdown", benda);
+  svg.addEventListener("pointerleave", e => { if (e.pointerType === "mouse") feljaGrafGildi(); });
+  document.addEventListener("pointerdown", e => { if (graf.idx != null && !e.target.closest("#graf")) feljaGrafGildi(); });
+  // Lyklaborð: ←/→ mánuð, Home/End
+  svg.addEventListener("focus", () => syndGrafGildi(graf.idx ?? graf.vb.length - 1));
+  svg.addEventListener("blur", feljaGrafGildi);
+  svg.addEventListener("keydown", e => {
+    const n = graf.vb.length, i = graf.idx ?? n - 1;
+    const j = { ArrowLeft: i - 1, ArrowRight: i + 1, Home: 0, End: n - 1, PageUp: i - 12, PageDown: i + 12 }[e.key];
+    if (j === undefined) return;
+    e.preventDefault();
+    syndGrafGildi(Math.max(0, Math.min(n - 1, j)));
+  });
+  new ResizeObserver(debounce(teiknaGraf, 60)).observe(svg.parentElement);
+  veljaTimabil(10);
+}
 
 // ── ORÐABÓK ──────────────────────────────────────────────────────
 let DICT = null, dictPromise = null, dictFilter = "all", dictLimit = 100;
@@ -505,6 +657,29 @@ reikna.lifeyrir = () => {
     <p class="note">Samtrygging greiðist út sem ævilangur lífeyrir — hversu hár hann verður fer eftir réttindakerfi sjóðsins. Sjáðu áætluð réttindi þín á <a href="https://www.lifeyrisgattin.is" target="_blank" rel="noopener">lifeyrisgattin.is</a>. Útreikningur miðar við föst laun að raunvirði.</p>`;
 };
 
+// Verðlagsreiknir: Z = X × VNV_nú / VNV_Y  (VNV 1988=100; VNV_Y = ársmeðaltal ársins Y)
+// Meðalverðbólga á ári = (VNV_nú / VNV_Y)^(1/n) − 1, n = ár frá miðju ári Y til nýjustu mælingar.
+// Staðfest með gögnum Hagstofu: VNV sept. 2026 / sept. 2025 gefur 5,92% (Hagstofa birtir 5,9%).
+// Dæmi: 100.000 kr árið 2000 (VNV 199,1) → 100.000 × 697,3 / 199,1 ≈ 350.226 kr í sept. 2026.
+reikna.verdlag = () => {
+  const X = val("v-upph"), Y = +$("#v-ar").value;
+  const { vnvAr, vnvNyjast } = SAGA_GOGN;
+  const vY = vnvAr.gildi[Y - vnvAr.fra], vN = vnvNyjast.gildi;
+  const [ny, nm] = vnvNyjast.man.split("-").map(Number), nyjast = `${MANUDIR[nm - 1]} ${ny}`;
+  const Z = X * vN / vY, n = tAr(ny, nm) - (Y + 0.5);
+  const medal = n > 0 ? (Math.pow(vN / vY, 1 / n) - 1) * 100 : 0;
+  $("#v-out").innerHTML = `
+    <div><div class="big">${kr(Z)}</div><div class="big-sub">${kr(X)} árið ${Y} jafngilda þessu á verðlagi í ${nyjast}</div></div>
+    ${rows([
+      [`Vísitala neysluverðs ${Y} (ársmeðaltal)`, tala(vY, 1)],
+      [`Vísitala neysluverðs, ${nyjast}`, tala(vN, 1)],
+      ["Verðlag hefur hækkað um", pct(Math.round((vN / vY - 1) * 1000) / 10)],
+      ["Meðalverðbólga á ári", "≈ " + pct(Math.round(medal * 10) / 10)],
+      [`1 kr árið ${Y}`, `= ${tala(vN / vY, 2)} kr nú`, "total"],
+    ])}
+    <p class="note">Byggt á vísitölu neysluverðs frá <a href="https://hagstofa.is/talnaefni/efnahagur/verdlag/visitala-neysluverds/" target="_blank" rel="noopener">Hagstofu Íslands</a> (1988=100). Ársmeðaltal ársins ${Y} er borið saman við nýjustu mælingu. Laun og einstök verð hafa ekki endilega breyst eins og meðalverðlag.</p>`;
+};
+
 reikna.gengi = () => {
   const a = parseNum($("#g-upph").value), fra = $("#g-fra").value, til = $("#g-til").value;
   const fI = iskPer(fra), tI = iskPer(til);
@@ -522,6 +697,9 @@ function initReiknivelar() {
   const sel = MYNTIR.map(c => `<option value="${c}">${c} — ${MYNT_NOFN[c]}</option>`).join("");
   $("#g-fra").innerHTML = sel; $("#g-til").innerHTML = sel;
   $("#g-fra").value = "EUR"; $("#g-til").value = "ISK";
+  const { vnvAr } = SAGA_GOGN, sidastaAr = vnvAr.fra + vnvAr.gildi.length - 1;
+  $("#v-ar").innerHTML = Array.from({ length: vnvAr.gildi.length }, (_, k) => sidastaAr - k).map(a => `<option value="${a}">${a}</option>`).join("");
+  $("#v-ar").value = "2000";
   $("#g-swap").onclick = () => { const f = $("#g-fra").value; $("#g-fra").value = $("#g-til").value; $("#g-til").value = f; reikna.gengi(); };
 
   // Tölur með þúsundaskilum
@@ -532,7 +710,7 @@ function initReiknivelar() {
     inp.addEventListener("focus", () => inp.select());
   });
 
-  const map = { l: "laun", p: "lan", s: "sparnadur", f: "lifeyrir", g: "gengi" };
+  const map = { l: "laun", p: "lan", s: "sparnadur", f: "lifeyrir", g: "gengi", v: "verdlag" };
   $("#view-reiknivelar").addEventListener("input", e => {
     const key = map[e.target.id?.split("-")[0]];
     if (key) reikna[key]();
