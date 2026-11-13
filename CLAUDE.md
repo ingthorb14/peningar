@@ -20,6 +20,9 @@ Svaraðu á íslensku, stutt og hnitmiðað. Kóðaathugasemdir á íslensku (ei
 - Vercel Hobby er eingöngu fyrir persónulega notkun án fjárhagslegs ávinnings — auglýsingar/affiliate krefjast Pro-áskriftar (sjá vercel.com/docs/limits/fair-use-guidelines).
 - `og-image.png` (1200×630) — búin til með `scripts/og-image.html` (opna í vafra → Sækja PNG).
 - Vercel Web Analytics: script neðst í `<head>` (ekki keyrt á localhost).
+- Útlit v2 (12. nóv. 2026): tókn efst í `css/style.css` (`--w`, `--r`, `--shadow*`, `--btn-*`, `--mono` = DM Mono fyrir tölur). Engin emoji í viðmóti: línutákn úr `IKON`/`ikon(nafn)` í gogn.js (líka notað í build.mjs); í index.html er skrifað `<i data-ikon="nafn">` og app.js skiptir því út.
+- Nýtt í app.js: skipanaleit (Ctrl/⌘K, `initSkipanaleit`), smágröf í „Staðan í dag“ (`smagraf`, gengissaga 90 daga frá Frankfurter), „Vinsæl verkfæri“ og „Hugtak dagsins“ á forsíðu, launaskipting (`.skipting`), stigahringur í prófi, „efst“-hnappur. Hero-grafíkin í index.html er skreyting án raunverulegra talna.
+- `<footer>` í index.html verður að vera án eiginda og innihalda `<span id="uppfaert"></span>` (build.mjs sækir hann með regex). Tenglar í footer byrja á `/#`.
 - Cache-busting: breytan `VERSJON` (`YYYYMMDDx`) efst í `<head>` í index.html — eini staðurinn; hækka við hverja breytingu.
 
 ## Vinnuflæði

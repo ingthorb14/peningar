@@ -113,6 +113,54 @@ function tala(n, aukastafir = 0, lagm = 0) {
 }
 const pct = n => tala(n, 2, 1) + "%";
 
+// ── TÁKN ───────────────────────────────────────────────────────────
+// Línutákn (24×24, stroke) í stað emoji. Notað í app.js, index.html (<i data-ikon="…">) og build.mjs.
+const IKON = {
+  search: '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.8-3.8"/>',
+  sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+  moon: '<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>',
+  menu: '<path d="M4 7h16M4 12h16M4 17h16"/>',
+  x: '<path d="M6 6l12 12M18 6 6 18"/>',
+  check: '<path d="m4.5 12.5 5 5 10-11"/>',
+  bulb: '<path d="M9 18h6M10 21.5h4"/><path d="M12 2.5a6 6 0 0 0-4 10.5c.8.8 1.2 1.6 1.4 2.5h5.2c.2-.9.6-1.7 1.4-2.5a6 6 0 0 0-4-10.5z"/>',
+  book: '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>',
+  calc: '<rect x="4" y="2" width="16" height="20" rx="2.5"/><path d="M8 6.5h8M8 11h.01M12 11h.01M16 11h.01M8 14.5h.01M12 14.5h.01M16 14.5h.01M8 18h.01M12 18h4"/>',
+  target: '<circle cx="12" cy="12" r="9.5"/><circle cx="12" cy="12" r="5.5"/><circle cx="12" cy="12" r="1.5"/>',
+  clock: '<circle cx="12" cy="12" r="9.5"/><path d="M12 6.5V12l3.5 2"/>',
+  cap: '<path d="M22 9.5 12 5 2 9.5 12 14l10-4.5z"/><path d="M6 11.5V16c3.3 2.7 8.7 2.7 12 0v-4.5M22 9.5V15"/>',
+  bank: '<path d="M3 21.5h18M5.5 18v-7M10 18v-7M14 18v-7M18.5 18v-7M12 2.5l9 5.5H3l9-5.5z"/>',
+  wallet: '<path d="M20 7.5V6a2 2 0 0 0-2-2H5.5a2.5 2.5 0 0 0 0 5H19a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6.5"/><path d="M16.5 14.5h.01"/>',
+  home: '<path d="M3 10.5 12 3l9 7.5V20a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 20v-9.5z"/><path d="M9.5 21.5v-7h5v7"/>',
+  trend: '<path d="M2.5 17.5 9 11l4 4 8.5-8.5"/><path d="M15.5 6.5h6v6"/>',
+  coins: '<circle cx="8.5" cy="8.5" r="6"/><path d="M18.1 10.4A6 6 0 1 1 10.4 18.1"/><path d="M7.5 6.5h1v4"/>',
+  key: '<circle cx="7.5" cy="15.5" r="5"/><path d="m11 12 9.5-9.5M16.5 6.5l3 3"/>',
+  hourglass: '<path d="M5.5 22h13M5.5 2h13M17 22v-4.2a2 2 0 0 0-.6-1.4L12 12l-4.4 4.4a2 2 0 0 0-.6 1.4V22M7 2v4.2a2 2 0 0 0 .6 1.4L12 12l4.4-4.4a2 2 0 0 0 .6-1.4V2"/>',
+  cart: '<circle cx="9" cy="20.5" r="1.2"/><circle cx="18" cy="20.5" r="1.2"/><path d="M2 2.5h3l2.6 12.4a1.5 1.5 0 0 0 1.5 1.1h8.6a1.5 1.5 0 0 0 1.5-1.2L20.5 7H6"/>',
+  swap: '<path d="m17 2 4 4-4 4"/><path d="M3 11V9.5A3.5 3.5 0 0 1 6.5 6H21"/><path d="m7 22-4-4 4-4"/><path d="M21 13v1.5a3.5 3.5 0 0 1-3.5 3.5H3"/>',
+  link: '<path d="M10 13.5a5 5 0 0 0 7.1 0l3-3a5 5 0 0 0-7.1-7.1l-1.2 1.2"/><path d="M14 10.5a5 5 0 0 0-7.1 0l-3 3a5 5 0 0 0 7.1 7.1l1.2-1.2"/>',
+  arrow: '<path d="M4.5 12h15M13.5 6l6 6-6 6"/>',
+  up: '<path d="M12 19.5v-15M6 10.5l6-6 6 6"/>',
+  ext: '<path d="M7 17 17 7M8.5 7H17v8.5"/>',
+  film: '<rect x="2.5" y="3" width="19" height="18" rx="2.5"/><path d="M7 3v18M17 3v18M2.5 8H7M2.5 12h19M2.5 16H7M17 8h4.5M17 16h4.5"/>',
+  tv: '<rect x="2.5" y="6.5" width="19" height="14" rx="2.5"/><path d="m8 2.5 4 4 4-4"/>',
+  mic: '<rect x="9" y="2.5" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5v4M8.5 21.5h7"/>',
+  shield: '<path d="M12 22s8-3.5 8-10V5.5l-8-3-8 3V12c0 6.5 8 10 8 10z"/>',
+  chart: '<path d="M5 20.5V11M11 20.5V4.5M17 20.5v-7M21.5 20.5h-19"/>',
+  pen: '<path d="M12 20.5h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>',
+  rss: '<path d="M4 11a9 9 0 0 1 9 9M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1.2"/>',
+  mail: '<rect x="2.5" y="4.5" width="19" height="15" rx="2.5"/><path d="m3 7 9 6 9-6"/>',
+  shuffle: '<path d="M16 3.5h5v5M4 20 21 3.5M21 15.5v5h-5M15 15l6 5.5M4 4l5 5"/>',
+  share: '<circle cx="18" cy="5" r="2.8"/><circle cx="6" cy="12" r="2.8"/><circle cx="18" cy="19" r="2.8"/><path d="m8.5 13.4 7 4.2M15.5 6.4l-7 4.2"/>',
+  spark: '<path d="M12 3l1.8 5.4a2.6 2.6 0 0 0 1.8 1.8L21 12l-5.4 1.8a2.6 2.6 0 0 0-1.8 1.8L12 21l-1.8-5.4a2.6 2.6 0 0 0-1.8-1.8L3 12l5.4-1.8a2.6 2.6 0 0 0 1.8-1.8L12 3z"/>',
+  refresh: '<path d="M20.5 12a8.5 8.5 0 1 1-2.6-6.1"/><path d="M20.5 3.5v5h-5"/>',
+};
+// Íslenski fáninn (25:18) — litir samkvæmt fánalögum
+const FANI = '<svg class="ic fani" viewBox="0 0 25 18" aria-hidden="true" focusable="false"><rect width="25" height="18" rx="2" fill="#02529c"/><path d="M0 9h25M9 0v18" stroke="#fff" stroke-width="4"/><path d="M0 9h25M9 0v18" stroke="#dc1e35" stroke-width="2"/></svg>';
+function ikon(nafn, klasi = "") {
+  if (nafn === "fani") return FANI;
+  return `<svg class="ic${klasi ? " " + klasi : ""}" viewBox="0 0 24 24" aria-hidden="true" focusable="false">${IKON[nafn] || ""}</svg>`;
+}
+
 // Fjarlægir broddstafi án þess að breyta lengd strengsins (svo auðkenning passi)
 function norm(s) {
   let out = "";

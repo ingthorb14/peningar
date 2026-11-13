@@ -39,6 +39,10 @@ function toast(msg) {
   clearTimeout(toast._t);
   toast._t = setTimeout(() => t.classList.remove("show"), 2200);
 }
+// Tákn: <i data-ikon="nafn" class="…"> í index.html verður að SVG (ikon() er í gogn.js)
+$$("[data-ikon]").forEach(el => { el.outerHTML = ikon(el.dataset.ikon, el.className); });
+const HREYFING = !matchMedia("(prefers-reduced-motion: reduce)").matches;
+
 const debounce = (fn, ms) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; };
 
 // ── LEIÐARKERFI (#flipi/undirsíða) ───────────────────────────────
@@ -50,14 +54,17 @@ function route() {
   const [slod, fyrirspurn = ""] = location.hash.slice(1).split("?");
   const [tab, sub] = decodeURIComponent(slod).split("/");
   const name = TABS.includes(tab) ? tab : "hugtok";
+  const fyrri = $(".view.active")?.id;
   $$(".view").forEach(v => v.classList.toggle("active", v.id === "view-" + name));
+  // Nýr flipi byrjar efst (nema slóðin vísi beint á hugtak, sem skrunar sjálft að spjaldinu)
+  if (fyrri && fyrri !== "view-" + name && !(name === "hugtok" && sub)) window.scrollTo(0, 0);
   $$(".tab-btn").forEach(b => {
     const on = b.dataset.tab === name;
     b.setAttribute("aria-selected", on);
     b.tabIndex = on ? 0 : -1;
     if (on) {
       if (!valmyndOpin()) b.scrollIntoView({ block: "nearest", inline: "nearest" });
-      $("#menuLabel").textContent = b.textContent.replace(/^\S+\s/, "");   // án emoji
+      $("#menuLabel").textContent = b.textContent.trim();
     }
   });
   lokaValmynd($("#tabBar").contains(document.activeElement));   // val í valmynd lokar henni
@@ -105,17 +112,49 @@ function teiknaTicker() {
   $("#ticker").innerHTML = `<div style="display:contents">${one}</div><div style="display:contents" aria-hidden="true">${one}</div>`;
 }
 
+// Smágraf (sparkline) úr talnaröð. Skalað í 100×38; vector-effect heldur línuþykkt.
+function smagraf(gildi, litur) {
+  if (!gildi || gildi.length < 2) return `<svg class="spark" viewBox="0 0 100 38" aria-hidden="true"></svg>`;
+  const min = Math.min(...gildi), max = Math.max(...gildi), bil = max - min || 1;
+  const pkt = gildi.map((v, i) => `${(i / (gildi.length - 1) * 100).toFixed(1)},${(34 - (v - min) / bil * 30).toFixed(1)}`);
+  const d = "M" + pkt.join("L");
+  return `<svg class="spark" viewBox="0 0 100 38" preserveAspectRatio="none" aria-hidden="true"><path class="fl" d="${d}L100,38L0,38Z" fill="${litur}"/><path d="${d}" stroke="${litur}"/></svg>`;
+}
+// Breyting milli tveggja gilda: ▲/▼ og mismunur (í prósentustigum, eða % ef eining er "%")
+const breyting = (nu, adur, eining) => {
+  const m = eining === "%" ? (nu / adur - 1) * 100 : nu - adur;
+  return Math.abs(m) < 0.005 ? "óbreytt" : `${m > 0 ? "▲" : "▼"} ${tala(Math.abs(m), 2, 1)}${eining === "%" ? "%" : ""}`;
+};
+let gengiSaga = null;   // { EUR: [...], USD: [...] } ISK á einingu síðustu ~90 daga (aðeins fyrir smágröf)
+
 function teiknaStats() {
   const el = $("#stats");
   if (!el) return;
   const m = MARKADUR;
+  const vb = VB_SAGA.slice(-24).map(d => d.v), sv = VB_SAGA.slice(-24).map(d => styrivextirA(d.t + 1 / 12 - 1e-6));
+  const fx = c => gengiSaga?.[c];
   el.innerHTML = [
-    ["Stýrivextir", pct(m.styrivextir.gildi), m.styrivextir.dags, m.styrivextir.heimild],
-    ["Verðbólga", pct(m.verdbolga.gildi), m.verdbolga.dags + " · markmið 2,5%", m.verdbolga.heimild],
-    ["EUR/ISK", nf2.format(iskPer("EUR")), (gengi.live ? "Lifandi · " : "") + gengi.dags, "#reiknivelar/gengi"],
-    ["USD/ISK", nf2.format(iskPer("USD")), (gengi.live ? "Lifandi · " : "") + gengi.dags, "#reiknivelar/gengi"],
-  ].map(([l, v, s, h]) => `<a class="card stat" href="${h}" ${h.startsWith("http") ? 'target="_blank" rel="noopener"' : ""} style="text-decoration:none;color:inherit">
-      <div class="lbl">${l}</div><div class="val">${v}</div><div class="sub">${s}</div></a>`).join("");
+    ["Stýrivextir", pct(m.styrivextir.gildi), m.styrivextir.dags, m.styrivextir.heimild, sv, "var(--teal)", breyting(sv.at(-1), sv.at(-13), "pp") + " á ári"],
+    ["Verðbólga", pct(m.verdbolga.gildi), m.verdbolga.dags + " · markmið 2,5%", m.verdbolga.heimild, vb, "var(--red)", breyting(vb.at(-1), vb.at(-13), "pp") + " á ári"],
+    ["EUR/ISK", nf2.format(iskPer("EUR")), (gengi.live ? "Lifandi · " : "") + gengi.dags, "#reiknivelar/gengi", fx("EUR"), "var(--gold)", fx("EUR") ? breyting(fx("EUR").at(-1), fx("EUR")[0], "%") + " · 90 d." : ""],
+    ["USD/ISK", nf2.format(iskPer("USD")), (gengi.live ? "Lifandi · " : "") + gengi.dags, "#reiknivelar/gengi", fx("USD"), "var(--gold)", fx("USD") ? breyting(fx("USD").at(-1), fx("USD")[0], "%") + " · 90 d." : ""],
+  ].map(([l, v, s, h, rod, litur, d]) => `<a class="card stat" href="${h}" ${h.startsWith("http") ? 'target="_blank" rel="noopener"' : ""} style="text-decoration:none;color:inherit">
+      <div class="stat-top"><span class="lbl">${l}</span>${d ? `<span class="delta" title="Breyting á tímabilinu${l.includes("/") ? "" : " (prósentustig)"}">${d}</span>` : ""}</div>
+      <div class="val">${v}</div>${smagraf(rod, litur)}<div class="sub">${s}</div></a>`).join("");
+}
+
+// Gengissaga síðustu 90 daga fyrir smágröfin (sama ókeypis þjónusta og lifandi gengið). Mistakist það sleppum við gröfunum.
+async function saekjaGengiSogu() {
+  try {
+    const fra = new Date(Date.now() - 90 * 864e5).toISOString().slice(0, 10);
+    const r = await fetch(`https://api.frankfurter.dev/v1/${fra}..?base=EUR&symbols=ISK,USD`);
+    if (!r.ok) throw new Error(r.status);
+    const d = await r.json(), dagar = Object.keys(d.rates || {}).sort();
+    if (dagar.length < 5) throw new Error("of fá gildi");
+    gengiSaga = { EUR: dagar.map(k => d.rates[k].ISK), USD: dagar.map(k => d.rates[k].ISK / d.rates[k].USD) };
+    if (gengiSaga.EUR.some(v => !isFinite(v)) || gengiSaga.USD.some(v => !isFinite(v))) gengiSaga = null;
+    teiknaStats();
+  } catch (e) { gengiSaga = null; }
 }
 
 // ── HUGTÖK: LEIT ─────────────────────────────────────────────────
@@ -150,14 +189,14 @@ function teiknaHugtak(h, fromAI = false) {
       </div>
       <div class="result-meta">
         <span class="pill ${f.cls}">${fromAI ? "Gervigreind" : f.nafn}</span>
-        ${fromAI ? "" : `<button class="icon-btn" type="button" data-share="${slug(h.term)}" title="Afrita tengil">🔗</button>`}
+        ${fromAI ? "" : `<button class="icon-btn" type="button" data-share="${slug(h.term)}" title="Afrita tengil" aria-label="Afrita tengil">${ikon("link")}</button>`}
       </div>
     </div>
     <div class="result-body">
       <p class="result-explain">${esc(h.explanation)}</p>
-      <div class="result-box"><h3>🇮🇸 Íslenskt dæmi</h3><p>${esc(h.example)}</p></div>
+      <div class="result-box"><h3>${ikon("fani")} Íslenskt dæmi</h3><p>${esc(h.example)}</p></div>
       ${h.keyNumber ? `<div class="result-box" style="text-align:center"><h3>Tala til að þekkja</h3><span class="big-num">${esc(h.keyNumber)}</span><p>${esc(h.keyNumberLabel)}</p></div>` : ""}
-      <div class="result-box tip"><h3>💡 Gott að vita</h3><p>${esc(h.tip)}</p></div>
+      <div class="result-box tip"><h3>${ikon("bulb")} Gott að vita</h3><p>${esc(h.tip)}</p></div>
       ${rel.length ? `<div class="result-foot"><span class="lbl">Tengd hugtök:</span>${rel.map(r => `<a class="chip" href="${hugtakSlod(r.term)}">${esc(r.term)}</a>`).join("")}</div>` : ""}
       ${fromAI ? `<p class="ai-note">Þessi skýring var búin til af gervigreind og getur innihaldið villur. Sannreyndu mikilvægar upplýsingar.</p>` : ""}
     </div>
@@ -179,12 +218,12 @@ async function ekkiFannst(q) {
   const ai = await aiTiltaek();
   if (!el.isConnected) return;   // ný leit hefur þegar teiknað yfir
   if (ai) {
-    el.innerHTML = `<button class="btn btn-sm" type="button" id="askAI">✨ Biðja gervigreind um skýringu</button>`;
+    el.innerHTML = `<button class="btn btn-sm" type="button" id="askAI">${ikon("spark")} Biðja gervigreind um skýringu</button>`;
     $("#askAI").onclick = () => spyrjaGervigreind(q);
   } else {
     const efni = encodeURIComponent("Tillaga að hugtaki: " + q);
-    el.innerHTML = (hits.length ? "" : `<a class="chip" href="#ordabok">📖 Skoða orðabókina</a>`) +
-      (NETFANG ? `<a class="chip" href="mailto:${NETFANG}?subject=${efni}">✉️ Stingdu upp á hugtaki</a>` : "");
+    el.innerHTML = (hits.length ? "" : `<a class="chip" href="#ordabok">${ikon("book")} Skoða orðabókina</a>`) +
+      (NETFANG ? `<a class="chip" href="mailto:${NETFANG}?subject=${efni}">${ikon("mail")} Stingdu upp á hugtaki</a>` : "");
   }
 }
 
@@ -271,7 +310,22 @@ function initHugtok() {
 
   // Yfirlitstölur fyrir ofan hugtakaspjöldin
   const wrap = $("#view-hugtok .wrap");
-  wrap.insertAdjacentHTML("afterbegin", `<h2 class="section-label">Staðan í dag</h2><div class="stats" id="stats"></div>${grafHtml()}`);
+  const VERKFAERI = [
+    ["laun", "wallet", "Útborguð laun", "Hvað færðu í vasann eftir skatt og lífeyri?"],
+    ["lan", "home", "Íbúðalán", "Verðtryggt eða óverðtryggt — berðu saman."],
+    ["leiga", "key", "Leiga eða kaup", "Hvort skilar betri eignastöðu eftir N ár?"],
+    ["sparnadur", "trend", "Sparnaður", "Sjáðu samsetta vexti vinna fyrir þig."],
+  ];
+  // Hugtak dagsins: sama hugtak allan daginn, nýtt á morgun
+  const hd = HUGTOK[Math.floor(Date.now() / 864e5) % HUGTOK.length];
+  wrap.insertAdjacentHTML("afterbegin", `<h2 class="section-label">Staðan í dag</h2><div class="stats" id="stats"></div>${grafHtml()}
+    <h2 class="section-label">Vinsæl verkfæri</h2>
+    <div class="tools">${VERKFAERI.map(([k, ic, t, d]) => `<a class="card tool" href="#reiknivelar/${k}"><div class="tool-ic">${ikon(ic)}</div><b>${t}</b><span>${d}</span>${ikon("arrow", "go")}</a>`).join("")}</div>
+    <a class="card dagsins" href="${hugtakSlod(hd.term)}">
+      <div class="tool-ic">${ikon("bulb")}</div>
+      <div><div class="k">Hugtak dagsins</div><div class="w">${esc(hd.term)}</div><div class="t">${esc(hd.explanation)}</div></div>
+      <span class="btn btn-ghost btn-sm">Lesa meira ${ikon("arrow")}</span>
+    </a>`);
   teiknaStats();
   initGraf();
 
@@ -279,7 +333,7 @@ function initHugtok() {
   $("#catFilter").innerHTML = cats.map(c => `<button class="chip${c === "all" ? " active" : ""}" type="button" data-cat="${c}">${c === "all" ? "Allt" : FLOKKAR[c].nafn}</button>`).join("");
   const teiknaSpjold = cat => {
     $("#cardGrid").innerHTML = HUGTOK.filter(h => cat === "all" || h.cat === cat)
-      .map(h => `<a class="glossary-card" href="${hugtakSlod(h.term)}" style="text-decoration:none"><span class="ct">${esc(h.term)}</span><span class="ch">${esc(h.hint)}</span></a>`).join("");
+      .map(h => { const f = FLOKKAR[h.cat] || FLOKKAR.grunnur; return `<a class="glossary-card" href="${hugtakSlod(h.term)}" style="text-decoration:none"><span class="pill ${f.cls}">${f.nafn}</span><span class="ct">${esc(h.term)}</span><span class="ch">${esc(h.hint)}</span>${ikon("arrow", "go")}</a>`; }).join("");
   };
   $("#catFilter").addEventListener("click", e => {
     const b = e.target.closest("[data-cat]");
@@ -293,7 +347,7 @@ function initHugtok() {
     const s = e.target.closest("[data-share]");
     if (s) {
       const url = location.origin + "/hugtok/" + s.dataset.share;
-      (navigator.clipboard?.writeText(url) || Promise.reject()).then(() => toast("Tengill afritaður 🔗"), () => prompt("Afritaðu tengilinn:", url));
+      (navigator.clipboard?.writeText(url) || Promise.reject()).then(() => toast("Tengill afritaður"), () => prompt("Afritaðu tengilinn:", url));
     }
     const d = e.target.closest("[data-dictq]");
     if (d) { e.preventDefault(); location.hash = "ordabok"; setTimeout(() => { $("#dictInput").value = d.dataset.dictq; renderDict(true); }, 0); }
@@ -355,7 +409,7 @@ function teiknaGraf() {
   const W = Math.round(svg.parentElement.clientWidth);
   if (!W) return;                                    // flipinn er falinn
   const H = Math.round(Math.min(320, Math.max(220, W * 0.42)));
-  const P = { l: 34, r: 10, t: 12, b: 24 };
+  const P = { l: 44, r: 10, t: 12, b: 24 };
   const t0 = graf.ar ? GRAF_ENDIR - graf.ar : VB_SAGA[0].t;
   const vb = VB_SAGA.filter(d => d.t >= t0 - 1e-9);
   const sv = [{ t: t0, v: styrivextirA(t0) }, ...SV_SAGA.filter(s => s.t > t0 && s.t < GRAF_ENDIR)];
@@ -387,7 +441,9 @@ function teiknaGraf() {
   svg.setAttribute("width", W); svg.setAttribute("height", H);
   const sidast = vb.at(-1);
   svg.setAttribute("aria-label", `Línurit: ársverðbólga og stýrivextir frá ${vb[0].y}. Nýjast (${MANUDIR[sidast.m - 1]} ${sidast.y}): verðbólga ${pct(sidast.v)}, stýrivextir ${pct(styrivextirA(sidast.t + 1 / 12 - 1e-6))}.`);
-  svg.innerHTML = `${grid}${markmid}
+  const svaedi = `${vbLina}L${f(x(vb.at(-1).t))},${f(y(yMin))}L${f(x(vb[0].t))},${f(y(yMin))}Z`;
+  svg.innerHTML = `<defs><linearGradient id="gVb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--red);stop-opacity:.2"/><stop offset="1" style="stop-color:var(--red);stop-opacity:0"/></linearGradient></defs>
+    ${grid}${markmid}<path class="g-area" d="${svaedi}" fill="url(#gVb)"/>
     <path class="g-sv" d="${svLina}"/><path class="g-vb" d="${vbLina}"/>
     <g class="g-hover" visibility="hidden"><line class="g-cursor" y1="${P.t}" y2="${H - P.b}"/><circle class="g-dot-vb" r="4"/><circle class="g-dot-sv" r="4"/></g>`;
   Object.assign(graf, { vb, x, y, W });
@@ -520,7 +576,7 @@ onEnter.ordabok = async () => {
     const pool = DICT.filter(e => e.en.includes(" ") && e.is.length < 40);
     const w = pool[dayIdx % pool.length];
     $("#wotd").innerHTML = `<div><div class="k">Orð dagsins</div><div class="w">${esc(w.en)}</div><div class="t">${esc(w.is)}</div></div>
-      <button class="btn btn-ghost btn-sm" type="button" id="randWord">🎲 Annað orð</button>`;
+      <button class="btn btn-ghost btn-sm" type="button" id="randWord">${ikon("shuffle")} Annað orð</button>`;
     $("#randWord").onclick = () => {
       const r = pool[Math.floor(Math.random() * pool.length)];
       $("#wotd .k").textContent = "Orð af handahófi";
@@ -612,6 +668,10 @@ reikna.laun = () => {
   const leidretting = 12 * (greiddurS - greiddur);
   $("#l-out").innerHTML = `
     <div><div class="big">${kr(net)}</div><div class="big-sub">útborgað á mánuði · ${pct(G ? net / G * 100 : 0)} af heildarlaunum</div></div>
+    ${G > 0 ? (hlutar => `<div class="skipting" role="img" aria-label="Skipting heildarlauna">${hlutar.map(([, v, c]) => `<i style="flex-grow:${Math.max(0, v)};flex-basis:0;background:${c}"></i>`).join("")}</div>
+      <div class="legend">${hlutar.map(([n, v, c]) => `<span><i style="background:${c}"></i>${n} ${pct(Math.round(v / G * 1000) / 10)}</span>`).join("")}</div>`)([
+        ["Útborgað", net, "var(--gold)"], ["Skattur", greiddur, "var(--red)"], ["Lífeyrir og séreign", lif + sereign, "var(--teal)"], ...(stett ? [["Stéttarfélag", stett, "var(--blue)"]] : []),
+      ]) : ""}
     ${rows([
       ["Heildarlaun", kr(G)],
       ["Lífeyrissjóður (4%)", "−" + kr(lif)],
@@ -837,6 +897,7 @@ function initReiknivelar() {
     inp.addEventListener("focus", () => inp.select());
   });
 
+  $("#view-reiknivelar").addEventListener("input", e => { if (e.target.type === "range") fyllaSleda(e.target); });
   const map = { l: "laun", p: "lan", s: "sparnadur", f: "lifeyrir", g: "gengi", v: "verdlag", e: "sereign", k: "leiga" };
   const uppfaeraSlod = debounce(skrifaSlod, 250);
   $("#view-reiknivelar").addEventListener("input", e => {
@@ -851,18 +912,20 @@ function initReiknivelar() {
   // Deilanlegar slóðir: sjálfgefin gildi geymd, aðeins breytt inntak fer í slóðina
   $$(".calc").forEach(c => {
     $$("input[id], select[id]", c).forEach(el => { SJALFGEFID[el.id] = inntakGildi(el); });
-    $("div", c).insertAdjacentHTML("beforeend", `<button class="btn btn-ghost btn-sm deila" type="button" data-deila="${c.id.replace("calc-", "")}">🔗 Deila útreikningi</button>`);
+    $("div", c).insertAdjacentHTML("beforeend", `<button class="btn btn-ghost btn-sm deila" type="button" data-deila="${c.id.replace("calc-", "")}">${ikon("link")} Deila útreikningi</button>`);
   });
   $("#view-reiknivelar").addEventListener("click", e => {
     const b = e.target.closest("[data-deila]");
     if (!b) return;
     skrifaSlod(b.dataset.deila);
     const url = location.href;
-    (navigator.clipboard?.writeText(url) || Promise.reject()).then(() => toast("Tengill á útreikning afritaður 🔗"), () => prompt("Afritaðu tengilinn:", url));
+    (navigator.clipboard?.writeText(url) || Promise.reject()).then(() => toast("Tengill á útreikning afritaður"), () => prompt("Afritaðu tengilinn:", url));
   });
   Object.values(reikna).forEach(f => f());
   LITILL_SKJAR.addEventListener("change", () => { reikna.lan(); reikna.sparnadur(); reikna.sereign(); reikna.leiga(); });   // teikna línurit upp á nýtt
 }
+// Fylling sleða: --fyll = hlutfall gildis af bili (notað í CSS)
+const fyllaSleda = el => el.style.setProperty("--fyll", ((el.value - el.min) / (el.max - el.min) * 100) + "%");
 // Inntak ↔ slóð: #reiknivelar/lan?verd=70000000&teg=jafnar  (lykill = id án forskeytis)
 const SJALFGEFID = {};
 const inntakGildi = el => el.type === "checkbox" ? (el.checked ? "1" : "0") : el.dataset.money !== undefined ? String(parseNum(el.value)) : el.value;
@@ -891,6 +954,7 @@ onEnter.reiknivelar = (sub, q) => {
   lesaSlod(name, q);
   $$(".calc").forEach(c => c.classList.toggle("active", c.id === "calc-" + name));
   $$("#calcNav .chip").forEach(c => c.classList.toggle("active", c.dataset.calc === name));
+  $$("#view-reiknivelar input[type=range]").forEach(fyllaSleda);
   reikna[name]();
 };
 
@@ -940,11 +1004,12 @@ function svara(idx) {
   if (rett) quiz.score++; else btns[idx].classList.add("wrong");
   $(".quiz-feedback").innerHTML = `${rett ? "✅ <strong>Rétt!</strong>" : "❌ <strong>Rangt.</strong>"} ${esc(q.explanation)}`;
   const last = quiz.i + 1 >= quiz.qs.length;
-  $(".quiz-actions").innerHTML = `<button class="btn" type="button" id="qNext">${last ? "Sjá niðurstöður 🏆" : "Næsta spurning →"}</button>`;
+  $(".quiz-actions").innerHTML = `<button class="btn" type="button" id="qNext">${last ? "Sjá niðurstöður" : "Næsta spurning"} ${ikon("arrow")}</button>`;
   $("#qNext").focus();
   $("#qNext").onclick = () => { quiz.i++; last ? lokaProfi() : teiknaSpurningu(); };
 }
 
+const HRINGUR = 2 * Math.PI * 52;   // ummál stigahrings (r = 52)
 function lokaProfi() {
   const s = quiz.score, t = quiz.qs.length;
   const best = Math.max(s, +(store.get("peningar-best") || 0));
@@ -957,12 +1022,14 @@ function lokaProfi() {
              ["💡", "Allir byrja einhvers staðar!", "peningar.is er hér til að hjálpa."];
   quiz = null;
   $("#quiz").innerHTML = `<div class="card quiz-final">
-    <div class="emoji">${emoji}</div><div class="title">${title}</div>
-    <div class="score">${s}/${t}</div><div class="msg">${msg}</div>
+    <svg class="hringur" viewBox="0 0 120 120" role="img" aria-label="${s} af ${t} rétt"><circle class="bak" cx="60" cy="60" r="52"/><circle class="fyll" cx="60" cy="60" r="52" stroke-dasharray="${HRINGUR}" stroke-dashoffset="${HRINGUR}"/><text x="60" y="70">${s}/${t}</text></svg>
+    <div class="title">${emoji} ${title}</div><div class="msg">${msg}</div>
     <div class="best">Besti árangur þinn: ${best}/${t}</div>
-    <button class="btn" type="button" id="qAgain">Spila aftur 🔄</button>
-    <button class="btn btn-ghost" type="button" id="qShare" style="margin-left:0.4rem">Deila</button>
+    <button class="btn" type="button" id="qAgain">${ikon("refresh")} Spila aftur</button>
+    <button class="btn btn-ghost" type="button" id="qShare" style="margin-left:0.4rem">${ikon("share")} Deila</button>
   </div>`;
+  // Hringurinn fyllist í hlutfalli við rétt svör
+  requestAnimationFrame(() => requestAnimationFrame(() => $(".hringur .fyll")?.setAttribute("stroke-dashoffset", HRINGUR * (1 - s / t))));
   $("#qAgain").onclick = byrjaProf;
   $("#qShare").onclick = () => {
     const text = `Ég fékk ${s}/${t} í fjármálaprófinu á peningar.is 💰`;
@@ -985,23 +1052,27 @@ const ISL_AR = new Set(["1886", "1981", "2001", "2008", "2017", "2023", "2025"])
 function teiknaSogu(adeinsIs) {
   $("#timeline").innerHTML = SAGA.filter(s => !adeinsIs || ISL_AR.has(s.ar)).map(s => `
     <div class="tl-item${ISL_AR.has(s.ar) ? " is" : ""}">
-      <div class="tl-year">${s.ar}${ISL_AR.has(s.ar) ? `<span class="tl-flag">🇮🇸 Ísland</span>` : ""}</div>
+      <div class="tl-year">${s.ar}${ISL_AR.has(s.ar) ? `<span class="tl-flag">${ikon("fani")} Ísland</span>` : ""}</div>
       <h3 class="tl-title">${esc(s.titill)}</h3>
       <p class="tl-text">${esc(s.texti)}</p>
     </div>`).join("");
 }
 
+// Emoji í gögnum (gogn.js) → línutákn
+const EFNIS_IKON = { "🎬": "film", "📺": "tv", "📖": "book", "🎙️": "mic" };
+const FLOKKA_IKON = { banki: "bank", lifeyrir: "hourglass", verdbref: "chart", trygging: "shield", annad: "bank" };
+// Upphafsstafir fyrirtækis: „Arion banki“ → „AB“, „Landsbankinn“ → „La“
+const upphafsstafir = nafn => { const o = nafn.split(/\s+/).filter(w => /^\p{L}/u.test(w)); return o.length > 1 ? o[0][0] + o[1][0].toUpperCase() : nafn.slice(0, 2); };
 function teiknaFraedast() {
   const tagName = { beg: "Byrjendur", all: "Allir", adv: "Lengra komnir" };
   $("#fraedast").innerHTML = FRAEDAST.map(sec => `
     <h3 class="section-label">${esc(sec.flokkur)}</h3>
     <div class="grid">${sec.items.map(i => `
       <div class="card tile">
-        <div class="tile-emoji" aria-hidden="true">${i.e}</div>
+        <div class="tile-head"><div class="tile-ic">${ikon(EFNIS_IKON[i.e] || "book")}</div><span class="tag tag-${i.tag}">${tagName[i.tag]}</span></div>
         <div class="tile-title">${esc(i.t)}</div>
         <div class="tile-sub">${esc(i.s)}</div>
         <div class="tile-desc">${esc(i.d)}</div>
-        <span class="tag tag-${i.tag}">${tagName[i.tag]}</span>
       </div>`).join("")}</div>`).join("");
 }
 
@@ -1009,14 +1080,14 @@ function teiknaFyrirtaeki(flokkur) {
   const keys = Object.keys(FYRIRTAEKI_FLOKKAR).filter(k => flokkur === "all" || k === flokkur);
   $("#fyrirtaeki").innerHTML = keys.map(k => {
     const F = FYRIRTAEKI_FLOKKAR[k];
-    return `<h3 class="section-label">${F.nafn}</h3><div class="grid">${FYRIRTAEKI.filter(f => f.flokkur === k).map(f => `
+    return `<h3 class="section-label">${ikon(FLOKKA_IKON[k] || "bank")} ${F.nafn}</h3><div class="grid">${FYRIRTAEKI.filter(f => f.flokkur === k).map(f => `
       <div class="card tile">
-        <div class="f-head"><span class="f-icon" aria-hidden="true">${F.icon}</span><span class="pill ${F.cls}">${F.merki}</span></div>
+        <div class="tile-head"><span class="einkenni ${F.cls}" aria-hidden="true">${esc(upphafsstafir(f.nafn))}</span><span class="pill ${F.cls}">${F.merki}</span></div>
         <div class="tile-title">${esc(f.nafn)}</div>
         <div class="f-full">${esc(f.fullt)}</div>
         <div class="tile-desc">${esc(f.lysing)}</div>
         <div class="facts">${f.stadreyndir.map(s => `<span class="fact">${esc(s)}</span>`).join("")}</div>
-        <a class="f-link" href="${f.url}" target="_blank" rel="noopener">Vefsíða ↗</a>
+        <a class="f-link" href="${f.url}" target="_blank" rel="noopener">Vefsíða ${ikon("ext")}</a>
       </div>`).join("")}</div>`;
   }).join("");
 }
@@ -1044,7 +1115,6 @@ function initEfni() {
 // ── ÞEMA & FLÝTILYKLAR ───────────────────────────────────────────
 function uppfaeraThemaTakka() {
   const dark = document.documentElement.getAttribute("data-theme") === "dark";
-  $("#themeBtn").textContent = dark ? "☀️" : "🌙";
   $("#themeBtn").setAttribute("aria-label", dark ? "Skipta í ljóst þema" : "Skipta í dökkt þema");
 }
 function initThema() {
@@ -1117,6 +1187,85 @@ document.addEventListener("keydown", e => {
   if (e.key === "/" && !e.target.matches("input,textarea,select")) { e.preventDefault(); fokusLeit(); }
 });
 
+// Footer-tenglar („/#flipi“) á sömu undirsíðu og nú er opin kalla heldur ekki á hashchange
+document.addEventListener("click", e => {
+  const a = e.target.closest('a[href^="/#"]');
+  if (a && a.hash === location.hash && a.pathname === location.pathname) { route(); window.scrollTo(0, 0); }
+});
+
+// ── SKIPANALEIT (Ctrl/⌘ K) ──────────────────────────────────────
+// Ein leit yfir flipa, reiknivélar og hugtök. <dialog> sér um fókusgildru og Esc.
+const SKIPANIR = [
+  ...$$(".tab-btn").map(b => ({ t: b.textContent.trim(), s: "Flipi", href: b.getAttribute("href"), ic: { hugtok: "bulb", ordabok: "book", reiknivelar: "calc", prof: "target", saga: "clock", fraedast: "cap", fyrirtaeki: "bank" }[b.dataset.tab] })),
+  ...$$("#calcNav [data-calc]").map(b => ({ t: b.textContent.trim(), s: "Reiknivél", href: "#reiknivelar/" + b.dataset.calc, ic: "calc" })),
+  { t: "Blogg", s: "Síða", href: "/blogg/", ic: "pen" },
+];
+let palIdx = 0, palItems = [];
+function teiknaSkipanir() {
+  const q = $("#palInput").value.trim(), n = norm(q);
+  const sk = SKIPANIR.filter(c => !n || norm(c.t).includes(n));
+  const hug = (n ? leita(q, 7).map(r => r.h) : ["Verðbólga", "Stýrivextir", "Verðtrygging", "Séreignarsparnaður"].map(t => HUGTOK.find(h => h.term === t)).filter(Boolean))
+    .map(h => ({ t: h.term, s: h.hint, href: hugtakSlod(h.term), ic: "bulb" }));
+  const ord = n ? [{ t: `Leita að „${q}“ í orðabókinni`, s: "Orðabók", ord: q, ic: "book" }] : [];
+  const hopar = (n ? [["Síður og verkfæri", sk], ["Hugtök", hug], ["Annað", ord]] : [["Hugtök", hug], ["Flýtileiðir", sk.slice(0, 9)]]).filter(h => h[1].length);
+  palItems = hopar.flatMap(h => h[1]);
+  palIdx = Math.min(palIdx, Math.max(0, palItems.length - 1));
+  let i = 0;
+  $("#palList").innerHTML = palItems.length ? hopar.map(([nafn, items]) => `<li class="pal-hd" role="presentation">${nafn}</li>` +
+    items.map(c => `<li class="pal-item" role="option" id="pal-${i}" data-i="${i}" aria-selected="${i++ === palIdx}">${ikon(c.ic)}<span>${esc(c.t)}</span><small>${esc(c.s)}</small></li>`).join("")).join("")
+    : `<li class="pal-tom">Ekkert fannst.</li>`;
+  $("#palInput").setAttribute("aria-activedescendant", palItems.length ? "pal-" + palIdx : "");
+}
+function veljaSkipun(c) {
+  if (!c) return;
+  $("#palette").close();
+  if (c.ord) { location.hash = "ordabok"; setTimeout(() => { $("#dictInput").value = c.ord; hladaOrdabok().then(() => renderDict(true)); $("#dictInput").focus(); }, 0); }
+  else if (c.href.startsWith("#")) { location.hash === c.href ? route() : (location.hash = c.href); }
+  else location.href = c.href;
+}
+function opnaSkipanaleit() {
+  const d = $("#palette");
+  if (d.open) return;
+  $("#palInput").value = ""; palIdx = 0;
+  teiknaSkipanir();
+  d.showModal();
+}
+function initSkipanaleit() {
+  document.body.insertAdjacentHTML("beforeend", `<dialog class="palette" id="palette" aria-label="Leita á peningar.is">
+    <div class="pal-box">
+      <div class="pal-in">${ikon("search")}<input type="text" id="palInput" placeholder="Leita að hugtaki, reiknivél eða síðu…" autocomplete="off" role="combobox" aria-expanded="true" aria-controls="palList" aria-label="Leita"><span class="kbd">Esc</span></div>
+      <ul class="pal-list" id="palList" role="listbox"></ul>
+      <div class="pal-foot"><span><span class="kbd">↑</span> <span class="kbd">↓</span> velja</span><span><span class="kbd">↵</span> opna</span></div>
+    </div></dialog>`);
+  const d = $("#palette"), inp = $("#palInput");
+  if (/Mac|iPhone|iPad/.test(navigator.platform)) $("#searchKbd").textContent = "⌘K";
+  inp.addEventListener("input", () => { palIdx = 0; teiknaSkipanir(); });
+  inp.addEventListener("keydown", e => {
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      e.preventDefault();
+      if (!palItems.length) return;
+      palIdx = (palIdx + (e.key === "ArrowDown" ? 1 : -1) + palItems.length) % palItems.length;
+      teiknaSkipanir();
+      $("#pal-" + palIdx)?.scrollIntoView({ block: "nearest" });
+    } else if (e.key === "Enter") { e.preventDefault(); veljaSkipun(palItems[palIdx]); }
+  });
+  $("#palList").addEventListener("click", e => { const li = e.target.closest("[data-i]"); if (li) veljaSkipun(palItems[+li.dataset.i]); });
+  d.addEventListener("click", e => { if (e.target === d) d.close(); });   // smellur á bakgrunn lokar
+  document.addEventListener("keydown", e => {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") { e.preventDefault(); d.open ? d.close() : opnaSkipanaleit(); }
+  });
+}
+
+// ── EFST Á SÍÐU ──────────────────────────────────────────────────
+function initEfst() {
+  document.body.insertAdjacentHTML("beforeend", `<button class="efst" id="efst" type="button" aria-label="Fara efst á síðu">${ikon("up")}</button>`);
+  const b = $("#efst");
+  b.onclick = () => window.scrollTo({ top: 0, behavior: HREYFING ? "smooth" : "auto" });
+  const syna = () => b.classList.toggle("synd", window.scrollY > 700);
+  window.addEventListener("scroll", syna, { passive: true });
+  syna();
+}
+
 // Fréttabréf neðst á hverjum flipa (birtist aðeins ef FRETTABREF_ACTION er stillt í gogn.js)
 function initFrettabref() {
   if (!FRETTABREF_ACTION) return;
@@ -1125,7 +1274,7 @@ function initFrettabref() {
 
 // ── RÆSING ───────────────────────────────────────────────────────
 $("#uppfaert").textContent = UPPFAERT;
-$("#searchBtn").onclick = fokusLeit;
+$("#searchBtn").onclick = opnaSkipanaleit;
 initThema();
 initValmynd();
 initFlipaLyklar();
@@ -1135,6 +1284,9 @@ initReiknivelar();
 initProf();
 initEfni();
 initFrettabref();
+initSkipanaleit();
+initEfst();
 teiknaTicker();
 route();
 saekjaGengi();
+saekjaGengiSogu();

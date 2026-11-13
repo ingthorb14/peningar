@@ -24,7 +24,7 @@ const SITE = (process.env.SITE_URL ||
 // ── Gögn úr js/gogn.js (keyrt í einangruðu samhengi) ──────────────
 const ctx = vm.createContext({});
 vm.runInContext(lesa("js/saga-gogn.js"), ctx);   // gogn.js les MARKADUR úr SAGA_GOGN
-const { HUGTOK, FLOKKAR, UPPFAERT, slug, frettabrefHtml } = vm.runInContext(lesa("js/gogn.js") + "\n;({ HUGTOK, FLOKKAR, UPPFAERT, slug, frettabrefHtml })", ctx);
+const { HUGTOK, FLOKKAR, UPPFAERT, slug, frettabrefHtml, ikon } = vm.runInContext(lesa("js/gogn.js") + "\n;({ HUGTOK, FLOKKAR, UPPFAERT, slug, frettabrefHtml, ikon })", ctx);
 
 // Cache-busting útgáfa og footer eru sótt úr index.html svo þau séu á einum stað
 const index = lesa("index.html");
@@ -53,11 +53,11 @@ for (const h of HUGTOK) {
 const RSS_LINK = `<link rel="alternate" type="application/rss+xml" title="peningar.is — blogg" href="/blogg/rss.xml">`;
 const MEIRA = `<h2 class="section-label">Meira á peningar.is</h2>
     <div class="chips" style="margin:0">
-      <a class="chip" href="/#hugtok">🔍 Öll hugtök</a>
-      <a class="chip" href="/#ordabok">📖 Orðabók</a>
-      <a class="chip" href="/#reiknivelar">🧮 Reiknivélar</a>
-      <a class="chip" href="/#prof">🎯 Próf</a>
-      <a class="chip" href="/blogg/">📝 Blogg</a>
+      <a class="chip" href="/#hugtok">${ikon("bulb")} Öll hugtök</a>
+      <a class="chip" href="/#ordabok">${ikon("book")} Orðabók</a>
+      <a class="chip" href="/#reiknivelar">${ikon("calc")} Reiknivélar</a>
+      <a class="chip" href="/#prof">${ikon("target")} Próf</a>
+      <a class="chip" href="/blogg/">${ikon("pen")} Blogg</a>
     </div>`;
 
 function sida({ titill, lysing, slod, ogTitill = titill, ogType = "article", ld, efni }) {
@@ -70,8 +70,8 @@ function sida({ titill, lysing, slod, ogTitill = titill, ogType = "article", ld,
 <title>${esc(titill)}</title>
 <meta name="description" content="${esc(lysing)}">
 <link rel="canonical" href="${url}">
-<meta name="theme-color" content="#f5f0e8" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#1a1814" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f6f3ec" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12110f" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="${ogType}">
 <meta property="og:locale" content="is_IS">
 <meta property="og:site_name" content="peningar.is">
@@ -86,7 +86,7 @@ function sida({ titill, lysing, slod, ogTitill = titill, ogType = "article", ld,
 ${RSS_LINK}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;1,9..144,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600..800;1,9..144,400..500&family=DM+Sans:opsz,wght@9..40,400..700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/style.css?v=${VERSJON}">
 <script>
   (function () {
@@ -104,12 +104,14 @@ ${ANALYTICS}
 
 <nav>
   <a href="/" class="logo" aria-label="peningar.is — forsíða">
-    peningar<span>.</span>is
-    <span class="logo-sub">fjármál á íslensku</span>
+    <span class="logo-mark" aria-hidden="true">p</span>
+    <span class="logo-text">peningar<span class="logo-dot">.</span>is
+      <span class="logo-sub">fjármál á íslensku</span>
+    </span>
   </a>
   <div class="nav-actions">
-    <a class="icon-btn" href="/#hugtok" title="Leita að hugtaki" aria-label="Öll hugtök">🔍 <span class="search-kbd">Öll hugtök</span></a>
-    <button class="icon-btn" id="themeBtn" type="button" aria-label="Skipta um þema">🌙</button>
+    <a class="icon-btn" href="/#hugtok" title="Leita að hugtaki" aria-label="Öll hugtök">${ikon("search")} <span class="search-kbd">Öll hugtök</span></a>
+    <button class="icon-btn theme-btn" id="themeBtn" type="button" aria-label="Skipta um þema">${ikon("moon", "ic-moon")}${ikon("sun", "ic-sun")}</button>
   </div>
 </nav>
 
@@ -123,7 +125,7 @@ ${FOOTER.replace('<span id="uppfaert"></span>', esc(UPPFAERT))}
   // Þemahnappur (sama hegðun og á forsíðu)
   (function () {
     var b = document.getElementById("themeBtn"), r = document.documentElement;
-    function merkja() { var d = r.getAttribute("data-theme") === "dark"; b.textContent = d ? "☀️" : "🌙"; b.setAttribute("aria-label", d ? "Skipta í ljóst þema" : "Skipta í dökkt þema"); }
+    function merkja() { var d = r.getAttribute("data-theme") === "dark"; b.setAttribute("aria-label", d ? "Skipta í ljóst þema" : "Skipta í dökkt þema"); }
     merkja();
     b.onclick = function () {
       var n = r.getAttribute("data-theme") === "dark" ? "light" : "dark";
@@ -172,9 +174,9 @@ function hugtakSida(h, s) {
       </div>
       <div class="result-body">
         <p class="result-explain">${esc(h.explanation)}</p>
-        <div class="result-box"><h2 class="h3">🇮🇸 Íslenskt dæmi</h2><p>${esc(h.example)}</p></div>
+        <div class="result-box"><h2 class="h3">${ikon("fani")} Íslenskt dæmi</h2><p>${esc(h.example)}</p></div>
         ${h.keyNumber ? `<div class="result-box" style="text-align:center"><h2 class="h3">Tala til að þekkja</h2><span class="big-num">${esc(h.keyNumber)}</span><p>${esc(h.keyNumberLabel)}</p></div>` : ""}
-        <div class="result-box tip"><h2 class="h3">💡 Gott að vita</h2><p>${esc(h.tip)}</p></div>
+        <div class="result-box tip"><h2 class="h3">${ikon("bulb")} Gott að vita</h2><p>${esc(h.tip)}</p></div>
         ${rel.length ? `<div class="result-foot"><span class="lbl">Tengd hugtök:</span>${rel.map(chip).join("")}</div>` : ""}
       </div>
     </article>

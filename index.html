@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Peningar — Fjármál á íslensku</title>
 <meta name="description" content="Fjármál á mannamáli: skýringar á fjármálahugtökum, ensk-íslensk viðskiptaorðabók, reiknivélar fyrir laun, lán og sparnað, spurningakeppni og nýjustu tölur um vexti og verðbólgu.">
-<meta name="theme-color" content="#f5f0e8" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#1a1814" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f6f3ec" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12110f" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="is_IS">
 <meta property="og:site_name" content="peningar.is">
@@ -17,11 +17,11 @@
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;1,9..144,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600..800;1,9..144,400..500&family=DM+Sans:opsz,wght@9..40,400..700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script>
   // Cache-busting: EINI staðurinn þar sem útgáfan er skráð. Hækkaðu við hverja breytingu.
   // Notuð fyrir css/js hér og fyrir data/ordabok.json í app.js.
-  var VERSJON = "20261006g";
+  var VERSJON = "20261112a";
   document.write('<link rel="stylesheet" href="css/style.css?v=' + VERSJON + '">');
 </script>
 <noscript><link rel="stylesheet" href="css/style.css"></noscript>
@@ -50,46 +50,92 @@
 
 <nav>
   <a href="#hugtok" class="logo" aria-label="peningar.is — forsíða">
-    peningar<span>.</span>is
-    <span class="logo-sub">fjármál á íslensku</span>
+    <span class="logo-mark" aria-hidden="true">p</span>
+    <span class="logo-text">peningar<span class="logo-dot">.</span>is
+      <span class="logo-sub">fjármál á íslensku</span>
+    </span>
   </a>
   <div class="nav-actions">
-    <button class="icon-btn" id="searchBtn" type="button" title="Leita (ýttu á /)">🔍 <span class="kbd search-kbd">/</span></button>
-    <button class="icon-btn" id="themeBtn" type="button" aria-label="Skipta um þema">🌙</button>
-    <button class="icon-btn menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="tabBar"><span aria-hidden="true">☰</span><span class="sr-only">Valmynd: </span><span id="menuLabel"></span></button>
+    <button class="icon-btn search-btn" id="searchBtn" type="button" title="Leita á allri síðunni" aria-haspopup="dialog"><i data-ikon="search"></i><span class="search-label">Leita að hugtaki eða reiknivél</span><span class="kbd search-kbd" id="searchKbd">Ctrl K</span></button>
+    <button class="icon-btn theme-btn" id="themeBtn" type="button" aria-label="Skipta um þema"><i data-ikon="moon" class="ic-moon"></i><i data-ikon="sun" class="ic-sun"></i></button>
+    <button class="icon-btn menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="tabBar"><i data-ikon="menu"></i><span class="sr-only">Valmynd: </span><span id="menuLabel"></span></button>
   </div>
 </nav>
 
 <div class="tab-bar" id="tabBar" role="tablist" aria-label="Hlutar síðunnar">
-  <a class="tab-btn" role="tab" href="#hugtok" data-tab="hugtok">🔍 Hugtök</a>
-  <a class="tab-btn" role="tab" href="#ordabok" data-tab="ordabok">📖 Orðabók</a>
-  <a class="tab-btn" role="tab" href="#reiknivelar" data-tab="reiknivelar">🧮 Reiknivélar</a>
-  <a class="tab-btn" role="tab" href="#prof" data-tab="prof">🎯 Próf</a>
-  <a class="tab-btn" role="tab" href="#saga" data-tab="saga">📜 Saga</a>
-  <a class="tab-btn" role="tab" href="#fraedast" data-tab="fraedast">📚 Fræðast</a>
-  <a class="tab-btn" role="tab" href="#fyrirtaeki" data-tab="fyrirtaeki">🏦 Fyrirtæki</a>
+  <a class="tab-btn" role="tab" href="#hugtok" data-tab="hugtok"><i data-ikon="bulb"></i><span>Hugtök</span></a>
+  <a class="tab-btn" role="tab" href="#ordabok" data-tab="ordabok"><i data-ikon="book"></i><span>Orðabók</span></a>
+  <a class="tab-btn" role="tab" href="#reiknivelar" data-tab="reiknivelar"><i data-ikon="calc"></i><span>Reiknivélar</span></a>
+  <a class="tab-btn" role="tab" href="#prof" data-tab="prof"><i data-ikon="target"></i><span>Próf</span></a>
+  <a class="tab-btn" role="tab" href="#saga" data-tab="saga"><i data-ikon="clock"></i><span>Saga</span></a>
+  <a class="tab-btn" role="tab" href="#fraedast" data-tab="fraedast"><i data-ikon="cap"></i><span>Fræðast</span></a>
+  <a class="tab-btn" role="tab" href="#fyrirtaeki" data-tab="fyrirtaeki"><i data-ikon="bank"></i><span>Fyrirtæki</span></a>
 </div>
 
 <main id="main">
 
 <!-- ══ HUGTÖK ══ -->
 <section class="view" id="view-hugtok" role="tabpanel" aria-labelledby="h-hugtok">
-  <div class="page-hero">
-    <h1 id="h-hugtok">Fjármál<br><em>á þínu máli</em></h1>
-    <p>Leitaðu að fjármálahugtaki og fáðu einfalda skýringu á íslensku, með íslensku dæmi og nýjustu tölum.</p>
-  </div>
+  <div class="page-hero hero-home">
+    <div class="hero-text">
+      <div class="eyebrow"><span class="pulse" aria-hidden="true"></span>Fjármálafræðsla á mannamáli</div>
+      <h1 id="h-hugtok">Fjármál<br><em>á þínu máli</em></h1>
+      <p>Leitaðu að fjármálahugtaki og fáðu einfalda skýringu á íslensku, með íslensku dæmi og nýjustu tölum.</p>
 
-  <div class="search-wrap">
-    <form class="search-row" id="searchForm" role="search" autocomplete="off">
-      <div class="search-field">
-        <label for="searchInput" class="sr-only">Leita að hugtaki</label>
-        <input type="search" id="searchInput" class="text-input" placeholder="t.d. „verðbólga“, „séreign“, „ETF“…"
-               role="combobox" aria-expanded="false" aria-controls="suggest" aria-autocomplete="list">
-        <ul class="suggest" id="suggest" role="listbox" hidden></ul>
-      </div>
-      <button class="btn" type="submit">Leita →</button>
-    </form>
-    <div class="chips" id="quickPicks"></div>
+      <form class="search-row" id="searchForm" role="search" autocomplete="off">
+        <div class="search-field">
+          <label for="searchInput" class="sr-only">Leita að hugtaki</label>
+          <i data-ikon="search" class="search-ic"></i>
+          <input type="search" id="searchInput" class="text-input" placeholder="t.d. „verðbólga“, „séreign“, „ETF“…"
+                 role="combobox" aria-expanded="false" aria-controls="suggest" aria-autocomplete="list">
+          <ul class="suggest" id="suggest" role="listbox" hidden></ul>
+        </div>
+        <button class="btn" type="submit">Leita <i data-ikon="arrow"></i></button>
+      </form>
+      <div class="chips" id="quickPicks"></div>
+    </div>
+
+    <!-- Skreyting: óhlutbundin grafík (engar raunverulegar tölur) -->
+    <div class="hero-art" aria-hidden="true">
+      <svg class="art" viewBox="0 0 440 380" focusable="false">
+        <defs>
+          <linearGradient id="artG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--gold);stop-opacity:.38"/><stop offset="1" style="stop-color:var(--gold);stop-opacity:0"/></linearGradient>
+          <linearGradient id="artC" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--gold-light)"/><stop offset="1" style="stop-color:var(--gold)"/></linearGradient>
+        </defs>
+        <g class="art-float a2">
+          <rect class="art-card" x="214" y="22" width="204" height="156" rx="20"/>
+          <rect class="art-line" x="236" y="46" width="62" height="8" rx="4"/>
+          <rect class="art-line" x="236" y="62" width="34" height="6" rx="3"/>
+          <rect class="art-bar" x="238" y="124" width="18" height="30" rx="5"/>
+          <rect class="art-bar" x="266" y="110" width="18" height="44" rx="5"/>
+          <rect class="art-bar" x="294" y="118" width="18" height="36" rx="5"/>
+          <rect class="art-bar" x="322" y="96" width="18" height="58" rx="5"/>
+          <rect class="art-bar" x="350" y="104" width="18" height="50" rx="5"/>
+          <rect class="art-bar hi" x="378" y="78" width="18" height="76" rx="5"/>
+        </g>
+        <g class="art-float a1">
+          <rect class="art-card" x="22" y="98" width="304" height="214" rx="24"/>
+          <rect class="art-line" x="46" y="124" width="88" height="8" rx="4"/>
+          <rect class="art-ink" x="46" y="143" width="132" height="18" rx="6"/>
+          <rect class="art-pill" x="244" y="122" width="60" height="26" rx="13"/>
+          <path class="art-pill-ic" d="M258 139l7-7 5 5 9-9M274 128h5v5"/>
+          <path class="art-grid" d="M46 196h256M46 228h256M46 260h256"/>
+          <path d="M46 268C76 258 92 266 120 244S168 222 196 228 244 196 302 172V288H46Z" fill="url(#artG)"/>
+          <path class="art-stroke" d="M46 268C76 258 92 266 120 244S168 222 196 228 244 196 302 172"/>
+          <circle class="art-dot" cx="302" cy="172" r="6.5"/>
+        </g>
+        <g class="art-float a3">
+          <circle cx="356" cy="266" r="48" fill="url(#artC)"/>
+          <circle class="art-coin-in" cx="356" cy="266" r="37"/>
+          <text class="art-kr" x="356" y="278" text-anchor="middle">kr</text>
+        </g>
+        <g class="art-float a4">
+          <rect class="art-card" x="8" y="34" width="104" height="48" rx="16"/>
+          <text class="art-pct" x="30" y="66">%</text>
+          <path class="art-stroke teal" d="M56 66l10-9 8 5 12-12 10 4"/>
+        </g>
+      </svg>
+    </div>
   </div>
 
   <div class="ticker-bar" aria-label="Helstu tölur">
@@ -108,13 +154,18 @@
 <!-- ══ ORÐABÓK ══ -->
 <section class="view" id="view-ordabok" role="tabpanel" aria-labelledby="h-ordabok">
   <div class="page-hero">
+    <i data-ikon="book" class="hero-mark"></i>
+    <div class="eyebrow"><i data-ikon="book"></i>Orðabók</div>
     <h2 id="h-ordabok">Ensk–íslensk<br><em>viðskiptaorðabók</em></h2>
     <p>Þúsundir viðskipta- og hagfræðihugtaka. Leitaðu á ensku eða íslensku — broddstafir skipta ekki máli.</p>
   </div>
   <div class="wrap">
     <div class="card wotd" id="wotd"></div>
     <label for="dictInput" class="sr-only">Leita í orðabók</label>
-    <input type="search" id="dictInput" class="text-input" placeholder="t.d. „yield“, „verðbréf“, „depreciation“…" autocomplete="off">
+    <div class="search-field">
+      <i data-ikon="search" class="search-ic"></i>
+      <input type="search" id="dictInput" class="text-input" placeholder="t.d. „yield“, „verðbréf“, „depreciation“…" autocomplete="off">
+    </div>
     <div class="dict-toolbar">
       <div class="chips" id="dictFilter" style="margin:0">
         <button class="chip active" data-f="all" type="button">Allt</button>
@@ -128,7 +179,7 @@
         <thead><tr><th style="width:45%">Enska</th><th>Íslenska</th></tr></thead>
         <tbody id="dictBody"></tbody>
       </table>
-      <div class="dict-no-results" id="dictNoResults" hidden>Engar niðurstöður 🤔 Prófaðu styttra leitarorð.</div>
+      <div class="dict-no-results" id="dictNoResults" hidden>Engar niðurstöður. Prófaðu styttra leitarorð.</div>
       <div class="dict-more" id="dictMore" hidden><button class="btn btn-ghost btn-sm" type="button">Sýna fleiri</button></div>
     </div>
   </div>
@@ -137,19 +188,21 @@
 <!-- ══ REIKNIVÉLAR ══ -->
 <section class="view" id="view-reiknivelar" role="tabpanel" aria-labelledby="h-reikni">
   <div class="page-hero">
+    <i data-ikon="calc" class="hero-mark"></i>
+    <div class="eyebrow"><i data-ikon="calc"></i>Reiknivélar</div>
     <h2 id="h-reikni">Fjármála<br><em>reiknivélar</em></h2>
     <p>Sjáðu hvað tölurnar þýða í raun, með íslenskum sköttum, lánareglum og nýjasta gengi.</p>
   </div>
   <div class="wrap">
     <div class="calc-nav chips" id="calcNav">
-      <button class="chip" type="button" data-calc="laun">💼 Útborguð laun</button>
-      <button class="chip" type="button" data-calc="lan">🏠 Íbúðalán</button>
-      <button class="chip" type="button" data-calc="sparnadur">📈 Sparnaður</button>
-      <button class="chip" type="button" data-calc="sereign">🏦 Séreign inn á lán</button>
-      <button class="chip" type="button" data-calc="leiga">🔑 Leiga eða kaup</button>
-      <button class="chip" type="button" data-calc="lifeyrir">👵 Lífeyrir</button>
-      <button class="chip" type="button" data-calc="verdlag">🛒 Verðlag</button>
-      <button class="chip" type="button" data-calc="gengi">💱 Gjaldmiðlar</button>
+      <button class="chip" type="button" data-calc="laun"><i data-ikon="wallet"></i>Útborguð laun</button>
+      <button class="chip" type="button" data-calc="lan"><i data-ikon="home"></i>Íbúðalán</button>
+      <button class="chip" type="button" data-calc="sparnadur"><i data-ikon="trend"></i>Sparnaður</button>
+      <button class="chip" type="button" data-calc="sereign"><i data-ikon="coins"></i>Séreign inn á lán</button>
+      <button class="chip" type="button" data-calc="leiga"><i data-ikon="key"></i>Leiga eða kaup</button>
+      <button class="chip" type="button" data-calc="lifeyrir"><i data-ikon="hourglass"></i>Lífeyrir</button>
+      <button class="chip" type="button" data-calc="verdlag"><i data-ikon="cart"></i>Verðlag</button>
+      <button class="chip" type="button" data-calc="gengi"><i data-ikon="swap"></i>Gjaldmiðlar</button>
     </div>
 
     <!-- Laun -->
@@ -268,7 +321,7 @@
         <div class="field"><label for="g-upph">Upphæð</label><input type="text" inputmode="decimal" id="g-upph" value="100"></div>
         <div class="field"><label for="g-fra">Frá</label><select id="g-fra"></select></div>
         <div class="field"><label for="g-til">Til</label><select id="g-til"></select></div>
-        <button class="btn btn-ghost btn-sm" type="button" id="g-swap">⇅ Víxla</button>
+        <button class="btn btn-ghost btn-sm" type="button" id="g-swap"><i data-ikon="swap"></i>Víxla</button>
       </div>
       <div class="calc-out" id="g-out"></div>
     </div>
@@ -278,6 +331,8 @@
 <!-- ══ PRÓF ══ -->
 <section class="view" id="view-prof" role="tabpanel" aria-labelledby="h-prof">
   <div class="page-hero">
+    <i data-ikon="target" class="hero-mark"></i>
+    <div class="eyebrow"><i data-ikon="target"></i>Próf</div>
     <h2 id="h-prof">Fjármála<br><em>spurningakeppni</em></h2>
     <p>Tíu spurningar af handahófi. Hversu vel þekkirðu íslensk fjármál? Svaraðu með músinni eða tökkunum 1–4.</p>
   </div>
@@ -287,13 +342,15 @@
 <!-- ══ SAGA ══ -->
 <section class="view" id="view-saga" role="tabpanel" aria-labelledby="h-saga">
   <div class="page-hero">
+    <i data-ikon="clock" class="hero-mark"></i>
+    <div class="eyebrow"><i data-ikon="clock"></i>Saga</div>
     <h2 id="h-saga">Fjármálasaga<br><em>í stuttu máli</em></h2>
     <p>Stóru augnablikin sem mótuðu fjármálaheiminn — og Ísland.</p>
   </div>
   <div class="wrap">
     <div class="chips" id="sagaFilter" style="margin:0 0 1.5rem">
       <button class="chip active" type="button" data-s="all">Allt</button>
-      <button class="chip" type="button" data-s="is">🇮🇸 Aðeins Ísland</button>
+      <button class="chip" type="button" data-s="is"><i data-ikon="fani"></i>Aðeins Ísland</button>
     </div>
     <div class="timeline" id="timeline"></div>
   </div>
@@ -302,6 +359,8 @@
 <!-- ══ FRÆÐAST ══ -->
 <section class="view" id="view-fraedast" role="tabpanel" aria-labelledby="h-fraedast">
   <div class="page-hero">
+    <i data-ikon="cap" class="hero-mark"></i>
+    <div class="eyebrow"><i data-ikon="cap"></i>Fræðast</div>
     <h2 id="h-fraedast">Fræðast<br><em>um fjármál</em></h2>
     <p>Kvikmyndir, bækur og hlaðvörp sem hjálpa þér að skilja fjármálaheiminn.</p>
   </div>
@@ -311,6 +370,8 @@
 <!-- ══ FYRIRTÆKI ══ -->
 <section class="view" id="view-fyrirtaeki" role="tabpanel" aria-labelledby="h-fyrirtaeki">
   <div class="page-hero">
+    <i data-ikon="bank" class="hero-mark"></i>
+    <div class="eyebrow"><i data-ikon="bank"></i>Fyrirtæki</div>
     <h2 id="h-fyrirtaeki">Íslensk<br><em>fjármálafyrirtæki</em></h2>
     <p>Hverjir eru helstu aðilarnir í íslenska fjármálakerfinu, og hver á hvað?</p>
   </div>
@@ -323,13 +384,43 @@
 </main>
 
 <footer>
-  Gert af nemanda í fjármálaverkfræði — <strong>ekki fjárfestingarráðgjöf</strong><br>
-  Tölur uppfærðar <span id="uppfaert"></span> · Heimildir:
-  <a href="https://sedlabanki.is/" rel="noopener">Seðlabanki Íslands</a>,
-  <a href="https://hagstofa.is/" rel="noopener">Hagstofa Íslands</a>,
-  <a href="https://www.skatturinn.is/" rel="noopener">Skatturinn</a>,
-  <a href="https://www.frankfurter.app/" rel="noopener">ECB-gengi (Frankfurter)</a><br>
-  <a href="/blogg/">Blogg</a> · <a href="/blogg/rss.xml">RSS</a>
+  <div class="foot">
+    <div class="foot-brand">
+      <a href="/" class="logo" aria-label="peningar.is — forsíða">
+        <span class="logo-mark" aria-hidden="true">p</span>
+        <span class="logo-text">peningar<span class="logo-dot">.</span>is</span>
+      </a>
+      <p>Fjármál á mannamáli: hugtök, orðabók og reiknivélar með íslenskum sköttum, lánareglum og nýjustu tölum.</p>
+      <p class="foot-note">Gert af nemanda í fjármálaverkfræði — <strong>ekki fjárfestingarráðgjöf</strong></p>
+    </div>
+    <div class="foot-col">
+      <h2>Efni</h2>
+      <a href="/#hugtok">Hugtök</a>
+      <a href="/#ordabok">Orðabók</a>
+      <a href="/#saga">Fjármálasaga</a>
+      <a href="/#fraedast">Fræðast</a>
+      <a href="/#fyrirtaeki">Fyrirtæki</a>
+    </div>
+    <div class="foot-col">
+      <h2>Verkfæri</h2>
+      <a href="/#reiknivelar/laun">Útborguð laun</a>
+      <a href="/#reiknivelar/lan">Íbúðalán</a>
+      <a href="/#reiknivelar/leiga">Leiga eða kaup</a>
+      <a href="/#reiknivelar/sparnadur">Sparnaður</a>
+      <a href="/#prof">Spurningakeppni</a>
+    </div>
+    <div class="foot-col">
+      <h2>Heimildir</h2>
+      <a href="https://sedlabanki.is/" rel="noopener">Seðlabanki Íslands</a>
+      <a href="https://hagstofa.is/" rel="noopener">Hagstofa Íslands</a>
+      <a href="https://www.skatturinn.is/" rel="noopener">Skatturinn</a>
+      <a href="https://www.frankfurter.app/" rel="noopener">ECB-gengi (Frankfurter)</a>
+    </div>
+  </div>
+  <div class="foot-bar">
+    <span>Tölur uppfærðar <span id="uppfaert"></span></span>
+    <span><a href="/blogg/">Blogg</a> · <a href="/blogg/rss.xml">RSS</a></span>
+  </div>
 </footer>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
