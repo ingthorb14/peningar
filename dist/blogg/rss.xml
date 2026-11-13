@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+  <title>peningar.is — blogg</title>
+  <link>https://peningar.vercel.app/blogg/</link>
+  <atom:link href="https://peningar.vercel.app/blogg/rss.xml" rel="self" type="application/rss+xml"/>
+  <description>Greinar um íslensk fjármál á mannamáli.</description>
+  <language>is</language>
+  <item>
+    <title>Verðtryggt eða óverðtryggt 2026?</title>
+    <link>https://peningar.vercel.app/blogg/verdtryggt-eda-overdtryggt-2026</link>
+    <guid isPermaLink="true">https://peningar.vercel.app/blogg/verdtryggt-eda-overdtryggt-2026</guid>
+    <pubDate>Tue, 06 Oct 2026 12:00:00 GMT</pubDate>
+    <description>Hvort íbúðalánið hentar betur haustið 2026? Við berum saman greiðslubyrði, eftirstöðvar og áhættu með tölum úr reiknivélinni.</description>
+  </item>
+</channel>
+</rss>

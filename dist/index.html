@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="is">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Peningar — Fjármál á íslensku</title>
+<meta name="description" content="Fjármál á mannamáli: skýringar á fjármálahugtökum, ensk-íslensk viðskiptaorðabók, reiknivélar fyrir laun, lán og sparnað, spurningakeppni og nýjustu tölur um vexti og verðbólgu.">
+<meta name="theme-color" content="#f5f0e8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1a1814" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="is_IS">
+<meta property="og:site_name" content="peningar.is">
+<meta property="og:title" content="Peningar — Fjármál á íslensku">
+<meta property="og:description" content="Hugtök, orðabók, reiknivélar og nýjustu vextir og verðbólga — allt á íslensku.">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://peningar.vercel.app/">
+<meta property="og:url" content="https://peningar.vercel.app/">
+<meta property="og:image" content="https://peningar.vercel.app/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<link rel="alternate" type="application/rss+xml" title="peningar.is — blogg" href="/blogg/rss.xml">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;1,9..144,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script>
+  // Cache-busting: EINI staðurinn þar sem útgáfan er skráð. Hækkaðu við hverja breytingu.
+  // Notuð fyrir css/js hér og fyrir data/ordabok.json í app.js.
+  var VERSJON = "20261006g";
+  document.write('<link rel="stylesheet" href="css/style.css?v=' + VERSJON + '">');
+</script>
+<noscript><link rel="stylesheet" href="css/style.css"></noscript>
+<script>
+  // Stillir þema áður en síðan teiknast, svo hún blikki ekki
+  (function () {
+    var t = null;
+    try { t = localStorage.getItem("peningar-theme"); } catch (e) {}
+    if (!t) t = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    document.documentElement.setAttribute("data-theme", t);
+  })();
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebSite","name":"peningar.is","inLanguage":"is","description":"Fjármál á íslensku — hugtök, orðabók og reiknivélar."}
+</script>
+<script>
+  // Vercel Web Analytics — engar vafrakökur. Ekki keyrt á localhost (þar er ekkert /_vercel).
+  window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+  if (!/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) {
+    var va = document.createElement("script"); va.defer = true; va.src = "/_vercel/insights/script.js"; document.head.appendChild(va);
+  }
+</script>
+</head>
+<body>
+<a class="skip-link" href="#main">Fara beint í efni</a>
+
+<nav>
+  <a href="#hugtok" class="logo" aria-label="peningar.is — forsíða">
+    peningar<span>.</span>is
+    <span class="logo-sub">fjármál á íslensku</span>
+  </a>
+  <div class="nav-actions">
+    <button class="icon-btn" id="searchBtn" type="button" title="Leita (ýttu á /)">🔍 <span class="kbd search-kbd">/</span></button>
+    <button class="icon-btn" id="themeBtn" type="button" aria-label="Skipta um þema">🌙</button>
+    <button class="icon-btn menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="tabBar"><span aria-hidden="true">☰</span><span class="sr-only">Valmynd: </span><span id="menuLabel"></span></button>
+  </div>
+</nav>
+
+<div class="tab-bar" id="tabBar" role="tablist" aria-label="Hlutar síðunnar">
+  <a class="tab-btn" role="tab" href="#hugtok" data-tab="hugtok">🔍 Hugtök</a>
+  <a class="tab-btn" role="tab" href="#ordabok" data-tab="ordabok">📖 Orðabók</a>
+  <a class="tab-btn" role="tab" href="#reiknivelar" data-tab="reiknivelar">🧮 Reiknivélar</a>
+  <a class="tab-btn" role="tab" href="#prof" data-tab="prof">🎯 Próf</a>
+  <a class="tab-btn" role="tab" href="#saga" data-tab="saga">📜 Saga</a>
+  <a class="tab-btn" role="tab" href="#fraedast" data-tab="fraedast">📚 Fræðast</a>
+  <a class="tab-btn" role="tab" href="#fyrirtaeki" data-tab="fyrirtaeki">🏦 Fyrirtæki</a>
+</div>
+
+<main id="main">
+
+<!-- ══ HUGTÖK ══ -->
+<section class="view" id="view-hugtok" role="tabpanel" aria-labelledby="h-hugtok">
+  <div class="page-hero">
+    <h1 id="h-hugtok">Fjármál<br><em>á þínu máli</em></h1>
+    <p>Leitaðu að fjármálahugtaki og fáðu einfalda skýringu á íslensku, með íslensku dæmi og nýjustu tölum.</p>
+  </div>
+
+  <div class="search-wrap">
+    <form class="search-row" id="searchForm" role="search" autocomplete="off">
+      <div class="search-field">
+        <label for="searchInput" class="sr-only">Leita að hugtaki</label>
+        <input type="search" id="searchInput" class="text-input" placeholder="t.d. „verðbólga“, „séreign“, „ETF“…"
+               role="combobox" aria-expanded="false" aria-controls="suggest" aria-autocomplete="list">
+        <ul class="suggest" id="suggest" role="listbox" hidden></ul>
+      </div>
+      <button class="btn" type="submit">Leita →</button>
+    </form>
+    <div class="chips" id="quickPicks"></div>
+  </div>
+
+  <div class="ticker-bar" aria-label="Helstu tölur">
+    <div class="ticker" id="ticker"></div>
+  </div>
+
+  <div id="result" aria-live="polite"></div>
+
+  <div class="wrap">
+    <h2 class="section-label">Öll hugtök</h2>
+    <div class="chips" id="catFilter" style="margin:-0.4rem 0 1rem"></div>
+    <div class="card-grid" id="cardGrid"></div>
+  </div>
+</section>
+
+<!-- ══ ORÐABÓK ══ -->
+<section class="view" id="view-ordabok" role="tabpanel" aria-labelledby="h-ordabok">
+  <div class="page-hero">
+    <h2 id="h-ordabok">Ensk–íslensk<br><em>viðskiptaorðabók</em></h2>
+    <p>Þúsundir viðskipta- og hagfræðihugtaka. Leitaðu á ensku eða íslensku — broddstafir skipta ekki máli.</p>
+  </div>
+  <div class="wrap">
+    <div class="card wotd" id="wotd"></div>
+    <label for="dictInput" class="sr-only">Leita í orðabók</label>
+    <input type="search" id="dictInput" class="text-input" placeholder="t.d. „yield“, „verðbréf“, „depreciation“…" autocomplete="off">
+    <div class="dict-toolbar">
+      <div class="chips" id="dictFilter" style="margin:0">
+        <button class="chip active" data-f="all" type="button">Allt</button>
+        <button class="chip" data-f="en" type="button">Enska → Íslenska</button>
+        <button class="chip" data-f="is" type="button">Íslenska → Enska</button>
+      </div>
+      <div class="dict-count" id="dictCount">Hleð orðabók…</div>
+    </div>
+    <div class="card dict-table-wrap">
+      <table class="dict-table">
+        <thead><tr><th style="width:45%">Enska</th><th>Íslenska</th></tr></thead>
+        <tbody id="dictBody"></tbody>
+      </table>
+      <div class="dict-no-results" id="dictNoResults" hidden>Engar niðurstöður 🤔 Prófaðu styttra leitarorð.</div>
+      <div class="dict-more" id="dictMore" hidden><button class="btn btn-ghost btn-sm" type="button">Sýna fleiri</button></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ REIKNIVÉLAR ══ -->
+<section class="view" id="view-reiknivelar" role="tabpanel" aria-labelledby="h-reikni">
+  <div class="page-hero">
+    <h2 id="h-reikni">Fjármála<br><em>reiknivélar</em></h2>
+    <p>Sjáðu hvað tölurnar þýða í raun, með íslenskum sköttum, lánareglum og nýjasta gengi.</p>
+  </div>
+  <div class="wrap">
+    <div class="calc-nav chips" id="calcNav">
+      <button class="chip" type="button" data-calc="laun">💼 Útborguð laun</button>
+      <button class="chip" type="button" data-calc="lan">🏠 Íbúðalán</button>
+      <button class="chip" type="button" data-calc="sparnadur">📈 Sparnaður</button>
+      <button class="chip" type="button" data-calc="sereign">🏦 Séreign inn á lán</button>
+      <button class="chip" type="button" data-calc="leiga">🔑 Leiga eða kaup</button>
+      <button class="chip" type="button" data-calc="lifeyrir">👵 Lífeyrir</button>
+      <button class="chip" type="button" data-calc="verdlag">🛒 Verðlag</button>
+      <button class="chip" type="button" data-calc="gengi">💱 Gjaldmiðlar</button>
+    </div>
+
+    <!-- Laun -->
+    <div class="card calc" id="calc-laun">
+      <div>
+        <h3>Útborguð laun</h3>
+        <p class="desc">Hvað færðu í vasann af heildarlaunum? Reiknað með skattþrepum og persónuafslætti <span data-skattar></span>.</p>
+        <div class="field"><label for="l-laun">Heildarlaun á mánuði (kr)</label><input type="text" inputmode="numeric" id="l-laun" data-money value="650000"></div>
+        <label class="check"><input type="checkbox" id="l-sereign" checked> Greiði 4% í séreignarsparnað</label>
+        <label class="check"><input type="checkbox" id="l-pa" checked> Nýti fullan persónuafslátt</label>
+        <div class="field"><label for="l-sveit">Sveitarfélag (útsvar 2026)</label><select id="l-sveit"></select></div>
+        <div class="field"><label for="l-stett">Stéttarfélagsgjald <output id="l-stett-o">1%</output></label><input type="range" id="l-stett" min="0" max="1.5" step="0.1" value="1"></div>
+      </div>
+      <div class="calc-out" id="l-out"></div>
+    </div>
+
+    <!-- Lán -->
+    <div class="card calc" id="calc-lan">
+      <div>
+        <h3>Íbúðalán</h3>
+        <p class="desc">Berðu saman verðtryggt og óverðtryggt jafngreiðslulán. Verðbólguforsendan skiptir öllu fyrir verðtryggða lánið.</p>
+        <div class="field"><label for="p-verd">Kaupverð (kr)</label><input type="text" inputmode="numeric" id="p-verd" data-money value="65000000"></div>
+        <div class="field"><label for="p-eigid">Eigið fé / útborgun (kr)</label><input type="text" inputmode="numeric" id="p-eigid" data-money value="13000000"></div>
+        <label class="check"><input type="checkbox" id="p-fyrstu"> Fyrstu kaup</label>
+        <div class="field"><label for="p-ar">Lánstími <output id="p-ar-o">40 ár</output></label><input type="range" id="p-ar" min="5" max="40" step="5" value="40"></div>
+        <div class="field"><label for="p-ov">Vextir óverðtryggt (%)</label><input type="number" id="p-ov" value="9.25" step="0.05"></div>
+        <div class="field"><label for="p-vt">Vextir verðtryggt (%)</label><input type="number" id="p-vt" value="4.2" step="0.05"></div>
+        <div class="field"><label for="p-vb">Áætluð meðalverðbólga (%)</label><input type="number" id="p-vb" value="4" step="0.25"></div>
+        <div class="field"><label for="p-teg">Greiðslufyrirkomulag</label><select id="p-teg"><option value="jafngr">Jafnar greiðslur (jafngreiðslulán)</option><option value="jafnar">Jafnar afborganir</option></select></div>
+        <div class="field"><label for="p-gjald">Lántökugjald (kr)</label><input type="text" inputmode="numeric" id="p-gjald" data-money value="0"></div>
+        <div class="field"><label for="p-auka">Aukainngreiðsla á mánuði (kr)</label><input type="text" inputmode="numeric" id="p-auka" data-money value="0"></div>
+      </div>
+      <div class="calc-out" id="p-out"></div>
+    </div>
+
+    <!-- Séreign inn á lán -->
+    <div class="card calc" id="calc-sereign">
+      <div>
+        <h3>Séreign inn á lán</h3>
+        <p class="desc">Skattfrjáls ráðstöfun séreignarsparnaðar inn á höfuðstól íbúðaláns. Hvað styttist lánið og hvað sparast?</p>
+        <div class="field"><label for="e-eft">Eftirstöðvar láns (kr)</label><input type="text" inputmode="numeric" id="e-eft" data-money value="45000000"></div>
+        <div class="field"><label for="e-teg">Tegund láns</label><select id="e-teg"><option value="ov">Óverðtryggt</option><option value="vt">Verðtryggt</option></select></div>
+        <div class="field"><label for="e-vextir">Vextir (%)</label><input type="number" id="e-vextir" value="9.25" step="0.05"></div>
+        <div class="field"><label for="e-vb">Áætluð meðalverðbólga (%)</label><input type="number" id="e-vb" value="4" step="0.25"></div>
+        <div class="field"><label for="e-ar">Eftirstandandi lánstími <output id="e-ar-o">35 ár</output></label><input type="range" id="e-ar" min="5" max="40" step="1" value="35"></div>
+        <div class="field"><label for="e-laun">Mánaðarlaun þín (kr)</label><input type="text" inputmode="numeric" id="e-laun" data-money value="650000"></div>
+        <div class="field"><label for="e-maki">Mánaðarlaun maka (kr, 0 ef enginn)</label><input type="text" inputmode="numeric" id="e-maki" data-money value="0"></div>
+        <div class="field"><label for="e-nyt">Séreign nýtt í <output id="e-nyt-o">10 ár</output></label><input type="range" id="e-nyt" min="1" max="10" step="1" value="10"></div>
+      </div>
+      <div class="calc-out" id="e-out"></div>
+    </div>
+
+    <!-- Leiga eða kaup -->
+    <div class="card calc" id="calc-leiga">
+      <div>
+        <h3>Leiga eða kaup</h3>
+        <p class="desc">Berðu saman eignastöðu eftir N ár: að kaupa íbúð með láni, eða leigja og fjárfesta eigið féð og mismuninn.</p>
+        <div class="field"><label for="k-verd">Kaupverð (kr)</label><input type="text" inputmode="numeric" id="k-verd" data-money value="65000000"></div>
+        <div class="field"><label for="k-eigid">Eigið fé (kr)</label><input type="text" inputmode="numeric" id="k-eigid" data-money value="13000000"></div>
+        <label class="check"><input type="checkbox" id="k-fyrstu"> Fyrstu kaup (hálft stimpilgjald)</label>
+        <div class="field"><label for="k-vextir">Vextir óverðtryggt (%)</label><input type="number" id="k-vextir" value="9.25" step="0.05"></div>
+        <div class="field"><label for="k-lanar">Lánstími <output id="k-lanar-o">40 ár</output></label><input type="range" id="k-lanar" min="5" max="40" step="5" value="40"></div>
+        <div class="field"><label for="k-leiga">Leiga á mánuði (kr)</label><input type="text" inputmode="numeric" id="k-leiga" data-money value="330000"></div>
+        <div class="field"><label for="k-hus">Hækkun fasteignaverðs á ári (%)</label><input type="number" id="k-hus" value="5" step="0.5"></div>
+        <div class="field"><label for="k-vb">Hækkun leigu / verðbólga á ári (%)</label><input type="number" id="k-vb" value="4" step="0.5"></div>
+        <div class="field"><label for="k-avoxt">Ávöxtun fjárfestingar á ári (%)</label><input type="number" id="k-avoxt" value="6" step="0.5"></div>
+        <div class="field"><label for="k-vidh">Viðhald, fasteignagjöld og trygging (% af verði á ári)</label><input type="number" id="k-vidh" value="1" step="0.1"></div>
+        <div class="field"><label for="k-N">Samanburður eftir <output id="k-N-o">10 ár</output></label><input type="range" id="k-N" min="1" max="30" step="1" value="10"></div>
+      </div>
+      <div class="calc-out" id="k-out"></div>
+    </div>
+
+    <!-- Sparnaður -->
+    <div class="card calc" id="calc-sparnadur">
+      <div>
+        <h3>Sparnaður</h3>
+        <p class="desc">Hvernig vex reglulegur sparnaður með samsettum vöxtum? Sjáðu líka virðið á verðlagi dagsins.</p>
+        <div class="field"><label for="s-upphaf">Upphafsupphæð (kr)</label><input type="text" inputmode="numeric" id="s-upphaf" data-money value="0"></div>
+        <div class="field"><label for="s-man">Mánaðarleg innborgun (kr)</label><input type="text" inputmode="numeric" id="s-man" data-money value="30000"></div>
+        <div class="field"><label for="s-r">Ávöxtun á ári <output id="s-r-o">7%</output></label><input type="range" id="s-r" min="0" max="15" step="0.5" value="7"></div>
+        <div class="field"><label for="s-ar">Fjöldi ára <output id="s-ar-o">25 ár</output></label><input type="range" id="s-ar" min="1" max="50" step="1" value="25"></div>
+        <div class="field"><label for="s-vb">Verðbólga á ári (%)</label><input type="number" id="s-vb" value="3" step="0.5"></div>
+      </div>
+      <div class="calc-out" id="s-out"></div>
+    </div>
+
+    <!-- Lífeyrir -->
+    <div class="card calc" id="calc-lifeyrir">
+      <div>
+        <h3>Lífeyrissparnaður</h3>
+        <p class="desc">Lágmarksiðgjald er 15,5% af launum (4% + 11,5%). Með séreign bætast við allt að 4% frá þér og 2% frá vinnuveitanda.</p>
+        <div class="field"><label for="f-laun">Mánaðarlaun (kr)</label><input type="text" inputmode="numeric" id="f-laun" data-money value="650000"></div>
+        <div class="field"><label for="f-ar">Ár til starfsloka <output id="f-ar-o">35 ár</output></label><input type="range" id="f-ar" min="1" max="50" step="1" value="35"></div>
+        <div class="field"><label for="f-r">Raunávöxtun á ári <output id="f-r-o">3,5%</output></label><input type="range" id="f-r" min="0" max="8" step="0.25" value="3.5"></div>
+        <label class="check"><input type="checkbox" id="f-sereign" checked> Með séreignarsparnaði (4% + 2%)</label>
+      </div>
+      <div class="calc-out" id="f-out"></div>
+    </div>
+
+    <!-- Verðlag -->
+    <div class="card calc" id="calc-verdlag">
+      <div>
+        <h3>Verðbólgureiknir</h3>
+        <p class="desc">Hvað jafngildir upphæð frá fyrri árum miklu í dag? Reiknað með vísitölu neysluverðs frá Hagstofu Íslands.</p>
+        <div class="field"><label for="v-upph">Upphæð (kr)</label><input type="text" inputmode="numeric" id="v-upph" data-money value="100000"></div>
+        <div class="field"><label for="v-ar">Árið</label><select id="v-ar"></select></div>
+      </div>
+      <div class="calc-out" id="v-out"></div>
+    </div>
+
+    <!-- Gengi -->
+    <div class="card calc" id="calc-gengi">
+      <div>
+        <h3>Gjaldmiðlabreytir</h3>
+        <p class="desc">Viðmiðunargengi Seðlabanka Evrópu, uppfært alla virka daga.</p>
+        <div class="field"><label for="g-upph">Upphæð</label><input type="text" inputmode="decimal" id="g-upph" value="100"></div>
+        <div class="field"><label for="g-fra">Frá</label><select id="g-fra"></select></div>
+        <div class="field"><label for="g-til">Til</label><select id="g-til"></select></div>
+        <button class="btn btn-ghost btn-sm" type="button" id="g-swap">⇅ Víxla</button>
+      </div>
+      <div class="calc-out" id="g-out"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ PRÓF ══ -->
+<section class="view" id="view-prof" role="tabpanel" aria-labelledby="h-prof">
+  <div class="page-hero">
+    <h2 id="h-prof">Fjármála<br><em>spurningakeppni</em></h2>
+    <p>Tíu spurningar af handahófi. Hversu vel þekkirðu íslensk fjármál? Svaraðu með músinni eða tökkunum 1–4.</p>
+  </div>
+  <div class="quiz-wrap" id="quiz"></div>
+</section>
+
+<!-- ══ SAGA ══ -->
+<section class="view" id="view-saga" role="tabpanel" aria-labelledby="h-saga">
+  <div class="page-hero">
+    <h2 id="h-saga">Fjármálasaga<br><em>í stuttu máli</em></h2>
+    <p>Stóru augnablikin sem mótuðu fjármálaheiminn — og Ísland.</p>
+  </div>
+  <div class="wrap">
+    <div class="chips" id="sagaFilter" style="margin:0 0 1.5rem">
+      <button class="chip active" type="button" data-s="all">Allt</button>
+      <button class="chip" type="button" data-s="is">🇮🇸 Aðeins Ísland</button>
+    </div>
+    <div class="timeline" id="timeline"></div>
+  </div>
+</section>
+
+<!-- ══ FRÆÐAST ══ -->
+<section class="view" id="view-fraedast" role="tabpanel" aria-labelledby="h-fraedast">
+  <div class="page-hero">
+    <h2 id="h-fraedast">Fræðast<br><em>um fjármál</em></h2>
+    <p>Kvikmyndir, bækur og hlaðvörp sem hjálpa þér að skilja fjármálaheiminn.</p>
+  </div>
+  <div class="wrap" id="fraedast"></div>
+</section>
+
+<!-- ══ FYRIRTÆKI ══ -->
+<section class="view" id="view-fyrirtaeki" role="tabpanel" aria-labelledby="h-fyrirtaeki">
+  <div class="page-hero">
+    <h2 id="h-fyrirtaeki">Íslensk<br><em>fjármálafyrirtæki</em></h2>
+    <p>Hverjir eru helstu aðilarnir í íslenska fjármálakerfinu, og hver á hvað?</p>
+  </div>
+  <div class="wrap">
+    <div class="chips" id="fFilter" style="margin:0 0 1.5rem"></div>
+    <div id="fyrirtaeki"></div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  Gert af nemanda í fjármálaverkfræði — <strong>ekki fjárfestingarráðgjöf</strong><br>
+  Tölur uppfærðar <span id="uppfaert"></span> · Heimildir:
+  <a href="https://sedlabanki.is/" rel="noopener">Seðlabanki Íslands</a>,
+  <a href="https://hagstofa.is/" rel="noopener">Hagstofa Íslands</a>,
+  <a href="https://www.skatturinn.is/" rel="noopener">Skatturinn</a>,
+  <a href="https://www.frankfurter.app/" rel="noopener">ECB-gengi (Frankfurter)</a><br>
+  <a href="/blogg/">Blogg</a> · <a href="/blogg/rss.xml">RSS</a>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+  document.write('<script src="js/saga-gogn.js?v=' + VERSJON + '"><\/script><script src="js/gogn.js?v=' + VERSJON + '"><\/script><script src="js/app.js?v=' + VERSJON + '"><\/script>');
+</script>
+</body>
+</html>
